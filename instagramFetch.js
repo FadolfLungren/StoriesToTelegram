@@ -58,6 +58,7 @@ async function fetchStories(users) {
       }
     }
   }
+  console.log(stories)
   return stories
 }
 

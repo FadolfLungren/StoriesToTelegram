@@ -12,7 +12,8 @@ function downloadPosts(ofUser, path) {
 function downloadStories(ofUser, path) {
   return fetchManager(ofUser,'stories', async (userID) => {
     const response = await Instagram.fetchStories(userID)
-    return downloadImages(response, path)
+    console.log("response"  + typeof(response))
+      return downloadImages(response, path)
   })
 }
 
@@ -74,12 +75,14 @@ async function fetchManager(username, logInfo, callback) {
 }
 
 async function downloadImages(arrayOfURLs, directory) {
+  const response = []
   for (var i=0; i<arrayOfURLs.length; i++) {
     const url = arrayOfURLs[i]
-    const response = await Instagram.fetchMedia(url)
+    response.push(await Instagram.fetchMedia(url))
     console.log(url)
-    return response//Заменить на массив чтобы for работал
+    //return response//Заменить на массив чтобы for работал
   }
+  return response
 }
 
 function getFileName(url) {

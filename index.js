@@ -1,9 +1,31 @@
 const Download = require("./downloadManager.js")
 const TelegramApi = require('node-telegram-bot-api')
 
-const Token = "1638628109:AAEwQN23T65IBYqLRJr6kN38jkU7vjoaQj4"
+const express = require("express")
+const Router = require("express");
 
-const bot = new TelegramApi(Token,{polling:true})
+const Token = "1638628109:AAEwQN23T65IBYqLRJr6kN38jkU7vjoaQj4"
+const URL = "https://547f-109-252-84-70.ngrok.io"
+
+const PORT = process.env.PORT || 8080
+
+const bot = new TelegramApi(Token)
+bot.setWebHook(URL+'/api/bot')
+
+
+const app = express()
+app.use(express.json())
+
+const router = new Router()
+
+router.post('/bot',async (req,res)=>{
+	console.log(req.body)
+	bot.processUpdate(req.body)
+	res.json("200")
+})
+
+app.use('/api', router)
+app.listen(PORT,()=> console.log('server started port: ' + PORT))
 
 class Session {
 	#session_id
@@ -21,16 +43,13 @@ class Session {
 	}
 
 	async startSession(){
-		await Download.stories(this.#account, this.#PATH).then(async stream => {
-			console.log("session id:", this.#session_id, "sending_media")
-			await bot.sendVideo(this.ChatId, stream.data)
-
-		})
-		this.IntervalObj=setInterval(async ()=> {
-				await Download.stories(this.#account, this.#PATH).then(async stream => {
-					console.log("session id:", this.#session_id, "sending_media")
-					await bot.sendVideo(this.ChatId, stream.data)
-
+		this.#IntervalObj=setInterval(async ()=> {
+				await Download.stories(this.#account, this.#PATH).then(async stream_mass => {
+					console.log(stream_mass)
+					stream_mass.forEach(async stream => {
+						console.log("session id:", this.#session_id, "sending_media")
+						await bot.sendVideo(this.ChatId, stream.data)
+					})
 				})
 			}
 		,this.#milisec_between_posts)
@@ -39,7 +58,7 @@ class Session {
 	}
 
 	closeSession(){
-		clearInterval(this.IntervalObj)
+		clearInterval(this.#IntervalObj)
 	}
 }
 
@@ -50,7 +69,7 @@ bot.on('message', async msg=>{
 	const ChatId = msg.chat.id
 
 	if (text==="/start") {
-		const SessionObj = new Session("nike", "21", 1, ChatId)
+		const SessionObj = new Session("nike", "21", 0.5, ChatId)
 		await bot.sendMessage(ChatId, "session started")
 		Sessions.push(SessionObj)
 		await SessionObj.startSession()

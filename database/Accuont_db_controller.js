@@ -11,7 +11,7 @@ class AccountsController{
             }}).catch(error => {
             result = false
         })
-        console.log(`entries:${typeof response.data.graphql.user.id}`)
+        console.log(`entries:${typeof response.data.graphql}`)
         if(typeof response.data.graphql.user.id === "undefined"){
             console.log(`LENGTH REJECTED:${account_name}:`)
             return null

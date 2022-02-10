@@ -1,4 +1,4 @@
-const Axios = require('Axios')
+const Axios = require('axios')
 const Credentials = require('./credentials.json')
 const QueryData = require('./QueryData.json')
 const dbAccountsController = require('./database/Accuont_db_controller')

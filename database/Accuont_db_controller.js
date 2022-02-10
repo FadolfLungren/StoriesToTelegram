@@ -11,11 +11,11 @@ class AccountsController{
             }}).catch(error => {
             result = false
         })
-        if(!result.length){
-            console.log(`LENGTH REJECTED:${account_name}:${JSON.stringify(response)}`)
+        if(!response){
+            console.log(`LENGTH REJECTED:${account_name}:${JSON.stringify(response.body)}`)
             return null
         }else{
-            return result
+            return response
         }
     }
 

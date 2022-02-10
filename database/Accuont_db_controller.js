@@ -12,7 +12,7 @@ class AccountsController{
             result = false
         })
         if(!result.length){
-            console.log(`LENGTH REJECTED:${account_name}`)
+            console.log(`LENGTH REJECTED:${account_name}:${response}`)
             return null
         }else{
             return result

@@ -1,5 +1,5 @@
 const {person,session} = require("./models/models");
-const Axios = require('Axios')
+const Axios = require('axios')
 const Credentials = require('../credentials.json')
 const {stringify} = require("nodemon/lib/utils");
 class AccountsController{

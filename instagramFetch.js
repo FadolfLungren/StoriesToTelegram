@@ -1,6 +1,6 @@
 const Axios = require('axios')
 const Credentials = require('./credentials.json')
-const QueryData = require('./QueryData.json')
+const QueryData = require('./queryData.json')
 const dbAccountsController = require('./database/Accuont_db_controller')
 
 var baseURL = "https://www.instagram.com/graphql/query/";

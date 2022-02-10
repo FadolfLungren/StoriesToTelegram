@@ -5,14 +5,14 @@ const {stringify} = require("nodemon/lib/utils");
 class AccountsController{
     async ValidateUrl(account_name){
         var result = true
-        const response = await Axios.get(`https://www.instagram.com/${account_name}/`,{
+        const response = await Axios.get(`https://www.instagram.com/${account_name}?__a=1`,{
             headers: {
                 Cookie: Credentials.cookie
             }}).catch(error => {
             result = false
         })
-        console.log(`entries:${typeof response.data.graphql}`)
-        if(typeof response.data.graphql.user.id === "undefined"){
+        console.log(`entries:${typeof response}`)
+        if(!response){
             console.log(`LENGTH REJECTED:${account_name}:`)
             return null
         }else{

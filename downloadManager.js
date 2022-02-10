@@ -9,11 +9,11 @@ function downloadPosts(ofUser, path) {
   })
 }
 
-function downloadStories(ofUser, path) {
+function downloadStories(ofUser,ChatId) {
+  //console.log("ChatId:" + path)
   return fetchManager(ofUser,'stories', async (userID) => {
-    const response = await Instagram.fetchStories(userID)
-    console.log("response"  + typeof(response))
-      return downloadImages(response, path)
+    const response = await Instagram.fetchStories(userID,ChatId)
+      return downloadImages(response)
   })
 }
 
@@ -74,15 +74,12 @@ async function fetchManager(username, logInfo, callback) {
   return await callback(userID)
 }
 
-async function downloadImages(arrayOfURLs, directory) {
-  const response = []
-  for (var i=0; i<arrayOfURLs.length; i++) {
-    const url = arrayOfURLs[i]
-    response.push(await Instagram.fetchMedia(url))
-    console.log(url)
-    //return response//Заменить на массив чтобы for работал
+async function downloadImages(arrayOfStories) {
+  for (var i=0; i<arrayOfStories.length; i++) {
+    const url = arrayOfStories[i].href
+    arrayOfStories[i].streamData = await Instagram.fetchMedia(url)
   }
-  return response
+  return arrayOfStories
 }
 
 function getFileName(url) {

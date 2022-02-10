@@ -1,6 +1,7 @@
 const Axios = require('Axios')
 const Credentials = require('./credentials.json')
 const QueryData = require('./QueryData.json')
+const dbAccountsController = require('./database/Accuont_db_controller')
 
 var baseURL = "https://www.instagram.com/graphql/query/";
 
@@ -28,7 +29,7 @@ async function sendRequest(url, parameters) {
     headers: {
       Cookie: Credentials.cookie
     }}).catch(error => {
-      console.error(`Server error: ${error.response.status}`);
+      console.error(`Server error:${url} ${error.response.status}`);
       process.exit(1)
   });
   return response ? response.data : null
@@ -36,31 +37,48 @@ async function sendRequest(url, parameters) {
 
 async function getUserID(user) {
   const response = await sendRequest(`https://instagram.com/${user}?__a=1`)
+  console.log(user+'++++++'+response.graphql)
   return response ? response.graphql.user.id : null
 }
 
-async function fetchStories(users) {
+
+class Story {
+  type
+  href
+  streamData
+  constructor(type,href){
+    this.type=type
+    this.href=href
+  }
+}
+
+async function fetchStories(users,ChatId) {
   var data = QueryData.stories;
   data.variables.reel_ids = users;
-
   var stories = [];
   var response = await sendRequest(baseURL,data)
+  console.log(`SETTING LAST POSTED Response:=====${JSON.stringify(response)}`)
   if (response.data.reels_media && response.data.reels_media.length) {
-    response = response.data.reels_media[0].items;
-
+    response = response.data.reels_media[0].items.reverse();
+    const last_posted = await dbAccountsController.getLastPosted(response[0].owner.username,ChatId)
     for (var i=0; i<response.length; i++) {
-      if (response[i].is_video) {
-        stories.push(response[i].video_resources[response[i].video_resources.length-1].src);
+      //console.log("RESPOSEiD:"+response[i].id)
+
+      if(!(response[i].id === last_posted)){
+        if (response[i].is_video) {
+          stories.push(new Story("vid",response[i].video_resources[response[i].video_resources.length-1].src));
+        } else {
+          stories.push(new Story("img",response[i].display_url));
+        }
+      }else{
+        break
       }
-      else {
-        console.log("display",response[i].display_url)
-        stories.push(response[i].display_url);
       }
+    dbAccountsController.setLastPosted(response[0].owner.username, ChatId, response[0].id)
     }
-  }
-  console.log(stories)
   return stories
-}
+  }
+
 
 async function fetchHighlightedStoriesList(user) {
   var data = QueryData.pinnedStoriesList;

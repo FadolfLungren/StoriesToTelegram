@@ -56,7 +56,7 @@ class AccountsController{
                                 await bot.sendMessage(msg.chat.id, AccountName+" Добавлен")
                                 return ss
                             }else{
-                                await bot.sendMessage(msg.chat.id, "Несуществующий аккаунт инстаграмм (если уверены что всё верно попробуйте ещё раз через некоторое время)")
+                                await bot.sendMessage(msg.chat.id, `Несуществующий аккаунт инстаграмм ${AccountName}(если уверены что всё верно попробуйте ещё раз через некоторое время)`)
                             }
                         } else {
                             await bot.sendMessage(msg.chat.id, "Уже добавлен")

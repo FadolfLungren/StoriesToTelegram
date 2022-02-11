@@ -101,6 +101,7 @@ class AccountsController{
             });
         }else{
             console.log(`${telegram_chat_id} не найден`)
+            return []
         }
     }
     async getLastPosted(username,chatId){

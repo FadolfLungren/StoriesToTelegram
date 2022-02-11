@@ -93,11 +93,15 @@ class AccountsController{
     }
     async getSessionsList(telegram_chat_id){
         const candidate = await person.findOne({where:{telegram_chat_id: stringify(telegram_chat_id)}})
-        return await session.findAll({
-            where: {
-                personId: candidate.id
-            }
-        });
+        if (candidate) {
+            return await session.findAll({
+                where: {
+                    personId: candidate.id
+                }
+            });
+        }else{
+            console.log(`${telegram_chat_id} не найден`)
+        }
     }
     async getLastPosted(username,chatId){
         const candidate = await person.findOne({where:{telegram_chat_id: stringify(chatId)}})

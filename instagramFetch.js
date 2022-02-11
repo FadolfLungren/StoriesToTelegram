@@ -57,7 +57,7 @@ async function fetchStories(users,ChatId) {
   data.variables.reel_ids = users;
   var stories = [];
   var response = await sendRequest(baseURL,data)
-  console.log(`SETTING LAST POSTED Response:=====${JSON.stringify(response)}`)
+  //console.log(`SETTING LAST POSTED Response:=====${JSON.stringify(response)}`)
   if (response.data.reels_media && response.data.reels_media.length) {
     response = response.data.reels_media[0].items.reverse();
     const last_posted = await dbAccountsController.getLastPosted(response[0].owner.username,ChatId)

@@ -30,7 +30,7 @@ class PersonController{
             if(candidate){
                 return candidate.monitor_limit
             }else{
-                console.log("eee")
+                console.log(`user ${username} not found`)
                 return null
             }
         }

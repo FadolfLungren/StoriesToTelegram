@@ -27,7 +27,12 @@ class PersonController{
         }else{
             console.log(username,id)
             const candidate = await  person.findOne({where:{telegram_chat_id: stringify(id)}})
-            return candidate.monitor_limit
+            if(candidate){
+                return candidate.monitor_limit
+            }else{
+                console.log("eee")
+                return null
+            }
         }
     }
     async getChatId(id){

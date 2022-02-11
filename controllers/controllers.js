@@ -6,6 +6,10 @@ class UserController{
         bot.processUpdate(req.body)
         res.json("200")
     }
+    async parseCornReq(req,res){
+        await bot.sendMessage(827988306,"Corn UPDATED")
+        res.json("200")
+    }
 
 }
 

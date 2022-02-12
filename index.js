@@ -19,7 +19,7 @@ const Start = async ()=>{
 	try{
 		await sequelize.authenticate()
 		await sequelize.sync()
-		const Pit = await botMain.Sync()
+		const Pit = await botMain.processMAIN.Sync()
 		await botMain.bot.sendMessage(827988306,`app restarted ${Pit} sessions was down`)
 		app.listen(PORT,()=> console.log('server started port: ' + PORT))
 

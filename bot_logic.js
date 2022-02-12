@@ -467,4 +467,4 @@ bot.on("callback_query" ,async query=>{
 
 })
 module.exports.bot = bot
-module.exports.Sync = ProcessMAIN.Sync
+module.exports.processMAIN = ProcessMAIN

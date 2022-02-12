@@ -60,14 +60,12 @@ class Session {
                         if (Story.type==="vid") {
                             console.log("session id:", this.session_id, "sending_media")
                             await bot.sendVideo(this.#ChatId, Story.streamData.data,{
-                                caption : `33e${Story.href}`
-                            },{
-                                caption : `3eee${Story.href}`
+                                'caption':`${Story.href}`
                             })
                         }else{
                             console.log("session id:", this.session_id, "sending_media")
                             await bot.sendPhoto(this.#ChatId, Story.streamData.data, {
-                                caption: `ddddd ddd${Story.href}`
+                                'caption': `ddddd ddd${Story.href}`
                             })
                         }
 

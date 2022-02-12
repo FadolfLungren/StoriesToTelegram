@@ -135,7 +135,7 @@ class MainProcess{
                     this.SessionsPipeline.splice(index, 1)
                     await SessionData.update({status: false})
                 }else{
-                    await bot.sendMessage(ChatId, `Session ${SessionData.account} went wrong:${SessionData.status}`)
+                    await bot.sendMessage(ChatId, `Session ${SessionData.account_name} went wrong:${SessionData.status}`)
                 }
                 console.log(this.SessionsPipeline)
             })

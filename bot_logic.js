@@ -61,6 +61,8 @@ class Session {
                             console.log("session id:", this.session_id, "sending_media")
                             await bot.sendVideo(this.#ChatId, Story.streamData.data,{
                                 caption: `${Story.href}`
+                            },{
+                                caption: `${Story.href}`
                             })
                         }else{
                             console.log("session id:", this.session_id, "sending_media")

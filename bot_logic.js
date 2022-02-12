@@ -347,10 +347,9 @@ bot.on('message', async msg=>{
         case "/close_keyboard":
             await bot.sendMessage(ChatId, "Бот работает исправно",{
                 reply_markup:{
-
                     keyboard: {
-                        "reply_markup": {
-                            "keyboard": [
+                        reply_markup: {
+                            keyboard: [
                                 [
                                     "Button 1",
                                     "Button 2"

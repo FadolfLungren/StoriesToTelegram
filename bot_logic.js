@@ -348,7 +348,7 @@ bot.on('message', async msg=>{
             await bot.sendMessage(ChatId, "Бот работает исправно",{
                 reply_markup:{
 
-                    keyboard: Keyboard.opt
+                    keyboard: Keyboard.home
                 }
             })
             break

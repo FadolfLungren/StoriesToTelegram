@@ -237,6 +237,9 @@ bot.onText(/\/delete/ ,async (msg)=>{
         await bot.sendMessage(msg.chat.id,"У вас нет аккаунтов, что-бы их удалять")
     }
 })
+bot.onText(/\/delete_keyboard/ ,async (msg)=>{
+    await bot.sendMessage(msg.chat.id, "KEYBOARD DELETED")
+})
 /*bot.onText(/\/del_(.+)/ ,async (msg,query)=>{
     if(query)
     {

@@ -237,14 +237,14 @@ bot.onText(/\/delete/ ,async (msg)=>{
         await bot.sendMessage(msg.chat.id,"У вас нет аккаунтов, что-бы их удалять")
     }
 })
-bot.onText(/\/del_(.+)/ ,async (msg,query)=>{
+/*bot.onText(/\/del_(.+)/ ,async (msg,query)=>{
     if(query)
     {
         await ProcessMAIN.deleteSession(msg.chat.id, query[1])
     }else{
         await bot.sendMessage(msg.from.id,"notBASED")
     }
-})
+})*/
 
 ActiveSessions=[]
 bot.on('message', async msg=>{
@@ -337,7 +337,7 @@ bot.on('message', async msg=>{
             })
             break
         case "/create_keyboard":
-            await bot.sendMessage(ChatId, "Бот работает исправно",{
+            await bot.sendMessage(ChatId, "",{
                 reply_markup:{
                     keyboard: Keyboard.home
                 }

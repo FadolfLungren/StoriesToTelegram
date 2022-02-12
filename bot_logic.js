@@ -347,6 +347,7 @@ bot.on('message', async msg=>{
         case "/close_keyboard":
             await bot.sendMessage(ChatId, "Бот работает исправно",{
                 reply_markup:{
+
                     keyboard: Keyboard.opt
                 }
             })

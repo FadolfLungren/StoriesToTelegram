@@ -350,7 +350,6 @@ bot.on('message', async msg=>{
 
                     keyboard: {
                         "reply_markup": {
-                            "resize_keyboard": true,
                             "keyboard": [
                                 [
                                     "Button 1",

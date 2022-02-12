@@ -237,9 +237,6 @@ bot.onText(/\/delete/ ,async (msg)=>{
         await bot.sendMessage(msg.chat.id,"У вас нет аккаунтов, что-бы их удалять")
     }
 })
-bot.onText(/\/delete_keyboard/ ,async (msg)=>{
-    await bot.sendMessage(msg.chat.id, "KEYBOARD DELETED")
-})
 /*bot.onText(/\/del_(.+)/ ,async (msg,query)=>{
     if(query)
     {
@@ -273,7 +270,7 @@ bot.on('message', async msg=>{
 ▶Чтобы запустить отслеживание сторис нажмите соответствующую кнопку на клавиатуре или пропишите /monitor
 
 /create_keyboard - <b>Создать клавиатуру</b> ✅
-/delete_keyboard - <b>Удалить клавиатуру</b> ❌
+/close_keyboard - <b>Удалить клавиатуру</b> ❌
 
 ▶Для обратной связи 
 📫fadolfsatan671@gmail.com 
@@ -346,7 +343,8 @@ bot.on('message', async msg=>{
                 }
             })
             break
-        case "/delete_keyboard":
+
+        case "/close_keyboard":
             await bot.sendMessage(ChatId, "Бот работает исправно",{
                 reply_markup:{
                     keyboard: Keyboard.opt

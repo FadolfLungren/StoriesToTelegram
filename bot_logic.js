@@ -50,19 +50,23 @@ class Session {
         })
 
         this.#IntervalObj=setInterval(async ()=> {
-                bot.sendMessage(827988306,"Checked")
-                await Download.stories(this.account, this.#ChatId).then(async Story_mass => {
 
+                await Download.stories(this.account, this.#ChatId).then(async Story_mass => {
+                    await bot.sendMessage(827988306,`checked ${this.account} ${Story_mass}`)
                     if(Story_mass.length===0){
                         console.log("stream empty")
                     }
                     await Story_mass.forEach(async Story => {
                         if (Story.type==="vid") {
                             console.log("session id:", this.session_id, "sending_media")
-                            await bot.sendVideo(this.#ChatId, Story.streamData.data)
+                            await bot.sendVideo(this.#ChatId, Story.streamData.data,{
+                                caption: `${Story.href}`
+                            })
                         }else{
                             console.log("session id:", this.session_id, "sending_media")
-                            await bot.sendPhoto(this.#ChatId, Story.streamData.data)
+                            await bot.sendPhoto(this.#ChatId, Story.streamData.data,{
+                                caption: `${Story.href}`
+                            })
                         }
 
                     })
@@ -273,7 +277,7 @@ bot.on('message', async msg=>{
 /delete_keyboard - <b>Удалить клавиатуру</b> ❌
 
 ▶Для обратной связи 
-📫fadolfSatan671@gmail.com 
+📫fadolfsatan671@gmail.com 
 телеграм: @jabronier
 `,{
                 parse_mode:"HTML"
@@ -316,7 +320,23 @@ bot.on('message', async msg=>{
                     }})
 
             break
-        case "СОСИ ЖОПУ":
+        case "Донат":
+            await bot.sendMessage(ChatId, `
+<b>Донат для поддержки проекта</b>
+
+<b>InstagrStoryBot</b> существует благодаря добровольным пожертвованиям пользователей. 
+Так же если вы хотите расширить возможности бота, например мониторть больше аккаунтов одновременно вы можете при пожертвовании указать свой Username телеграмм(Например: @InstagrStory_bot)
+<b>При донате в 100 рублей</b> ваш порог повышается с 3 до 10 аккаунтов навсегда
+<b>При донате в 500 рублей</b> ваш порог повышается с 3 до 50 аккаунтов навсегда
+<b>При донате в 1000 рублей</b> ваш порог становится 100 аккаунтов навсегда
+<b>При донате выше 1000</b> вы повышаете лимит по расчёту 200 рублей за аккаунт
+Все эти статусы считаются по совокупной стоимости пожертвований на один аккаунт телеграм, и они присваиваются с задеркой примерно в день
+
+Киви - 
+Сбер - 
+`,{
+                parse_mode:"HTML"
+            })
             break
         case "/start":
             break

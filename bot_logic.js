@@ -82,7 +82,8 @@ class MainProcess{
     SessionsPipeline = []
 
     constructor() {
-        this.Sync()
+        const PIT = this.Sync()
+        bot.sendMessage(827988306,`ProcessMAIN restarted ${PIT} sessions was down`)
     }
 
     async addActiveSession(msg,match){

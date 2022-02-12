@@ -19,8 +19,8 @@ const Start = async ()=>{
 	try{
 		await sequelize.authenticate()
 		await sequelize.sync()
-		await bot.sendMessage(827988306,`app restarted ${Pit} sessions was down`)
-		app.listen(PORT,()=> console.log('server started port: ' + PORT))
+		await bot.sendMessage(827988306,`Server R`)
+		app.listen(PORT,()=> bot.sendMessage(827988306,`Server Restarted on port: ${PORT}`))
 
 	}catch(e){
 		console.log('e')

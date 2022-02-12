@@ -134,6 +134,8 @@ class MainProcess{
                     //await bot.sendMessage(ChatId, `Session ${this.SessionsPipeline[index].account} closed id:${this.SessionsPipeline[index].session_id}`)
                     this.SessionsPipeline.splice(index, 1)
                     await SessionData.update({status: false})
+                }else{
+                    await bot.sendMessage(ChatId, `Session ${this.SessionsPipeline[index].account} went wrong:${this.SessionsPipeline[index].status}`)
                 }
                 console.log(this.SessionsPipeline)
             })
@@ -250,61 +252,9 @@ bot.on('message', async msg=>{
     switch (text){
         case "Начать мониторинг":
             await ProcessMAIN.OpenActiveSessionsOfUser(ChatId)
-            /*const Sessions = await dbAccountsController.getSessionsList(msg.chat.id)
-            //console.log("========"+typeof (Sessions.length))
-            if (!(Sessions.length === 0)){
-                Sessions.forEach(async SessionData =>{
-                    const SessionObj = new Session(SessionData)
-                    await SessionObj.startSession()
-                    await SessionData.update({status:true})
-                    ActiveSessions.push(SessionObj)
-                    await bot.sendMessage(ChatId, `Session ${SessionObj.account} id:${SessionObj.session_id} started`)
-                })
-                Keyboard.home[0][1]= "Закончить мониторинг"
-                bot.sendMessage(msg.chat.id, text,{
-                    reply_markup:{
-                        keyboard: Keyboard.home
-                    }
-                })
-            }else{
-                await bot.sendMessage(ChatId, "no_sessions")
-            }*/
-
             break
         case "Закончить мониторинг":
             await ProcessMAIN.CloseActiveSessionsOfUser(ChatId)
-            /*const SessionsToStop = await dbAccountsController.getSessionsList(msg.chat.id)
-            if (!(SessionsToStop.length === 0)){
-
-                SessionsToStop.forEach(async SessionData =>{
-                    if (!(ActiveSessions.length === 0)) {
-                        ActiveSessions.forEach(async (ActSessionObj, index) => {
-                            if (ActSessionObj.session_id === SessionData.id) {
-                                if (SessionData.status) {
-                                    ActSessionObj.closeSession()
-                                    ActiveSessions.splice(index, 1)
-                                    await SessionData.update({status: false})
-                                    await bot.sendMessage(ChatId, `Session ${ActSessionObj.account} closed id:${ActSessionObj.session_id}`)
-                                } else {
-                                    await bot.sendMessage(ChatId, `Session ${ActSessionObj.account} id:${ActSessionObj.session_id} status is False`)
-                                }
-                            }
-                        })
-                    }else{
-                        await bot.sendMessage(ChatId, `ActiveSessions Massive empty`)
-                    }
-                })
-
-
-                Keyboard.home[0][1]= "Начать мониторинг"
-                bot.sendMessage(msg.chat.id, text,{
-                    reply_markup:{
-                        keyboard: Keyboard.home
-                    }
-                })
-            }else{
-                await bot.sendMessage(ChatId, "no_sessions_to_close set it by /monitor")
-            }*/
             break
         case "Справка":
             await bot.sendMessage(ChatId, `

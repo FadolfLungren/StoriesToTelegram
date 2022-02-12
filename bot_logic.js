@@ -57,16 +57,12 @@ class Session {
                         console.log("stream empty")
                     }
                     await Story_mass.forEach(async Story => {
-                        const opts = {
-                            'caption': 'Caption *bold*',
-                            'parse_mode': 'markdown'
-                        };
                         if (Story.type==="vid") {
                             console.log("session id:", this.session_id, "sending_media")
-                            await bot.sendVideo(this.#ChatId, Story.streamData.data,opts)
+                            await bot.sendVideo(this.#ChatId, Story.streamData.data)
                         }else{
                             console.log("session id:", this.session_id, "sending_media")
-                            await bot.sendPhoto(this.#ChatId, Story.streamData.data, opts)
+                            await bot.sendPhoto(this.#ChatId, Story.streamData.data)
                         }
 
                     })
@@ -299,7 +295,7 @@ bot.on('message', async msg=>{
                 await bot.sendMessage(msg.chat.id, "Назначте аккаунты")
             }
             break
-        case "Настройки":
+        case "Настройки" || "/settings":
             const Account_list = await dbAccountsController.getSessionsList(msg.chat.id)
             var number_of_accs = 0
             if (Account_list){
@@ -330,7 +326,9 @@ bot.on('message', async msg=>{
 <b>При донате в 500 рублей</b> ваш порог повышается с 3 до 50 аккаунтов навсегда
 <b>При донате в 1000 рублей</b> ваш порог становится 100 аккаунтов навсегда
 <b>При донате выше 1000</b> вы повышаете лимит по расчёту 200 рублей за аккаунт
-Все эти статусы считаются по совокупной стоимости пожертвований на один аккаунт телеграм, и они присваиваются с задеркой примерно в день
+
+Все эти статусы считаются по совокупной стоимости пожертвований
+на один аккаунт телеграм, и они присваиваются с задеркой примерно в день
 
 Киви - 
 Сбер - 
@@ -338,10 +336,20 @@ bot.on('message', async msg=>{
                 parse_mode:"HTML"
             })
             break
-        case "/start":
+        case "/create_keyboard":
+            await bot.sendMessage(ChatId, "Бот работает исправно",{
+                reply_markup:{
+                    keyboard: Keyboard.home
+                }
+            })
             break
-        case "/monitor":
-            await bot.sendMessage(ChatId, "✅cerfСУКА")
+        case "/delete_keyboard":
+            await bot.sendMessage(ChatId, "Бот работает исправно",{
+                reply_markup:{
+                    keyboard: Keyboard.opt
+                }
+            })
+            break
         //default:
             //await bot.sendMessage(ChatId, text)
     }

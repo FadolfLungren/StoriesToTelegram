@@ -57,16 +57,16 @@ class Session {
                         console.log("stream empty")
                     }
                     await Story_mass.forEach(async Story => {
+                        const opts = {
+                            'caption': 'Caption *bold*',
+                            'parse_mode': 'markdown'
+                        };
                         if (Story.type==="vid") {
                             console.log("session id:", this.session_id, "sending_media")
-                            await bot.sendVideo(this.#ChatId, Story.streamData.data,{
-                                'caption':`${Story.href}`
-                            })
+                            await bot.sendVideo(this.#ChatId, Story.streamData.data,opts)
                         }else{
                             console.log("session id:", this.session_id, "sending_media")
-                            await bot.sendPhoto(this.#ChatId, Story.streamData.data, {
-                                'caption': `ddddd ddd${Story.href}`
-                            })
+                            await bot.sendPhoto(this.#ChatId, Story.streamData.data, opts)
                         }
 
                     })

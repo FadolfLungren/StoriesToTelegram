@@ -50,7 +50,7 @@ class Session {
         })
 
         this.#IntervalObj=setInterval(async ()=> {
-
+                bot.sendMessage(827988306,"Checked")
                 await Download.stories(this.account, this.#ChatId).then(async Story_mass => {
 
                     if(Story_mass.length===0){

@@ -9,7 +9,7 @@ const models = require("./database/models/models")
 router = require("./routes/bot.routes")
 
 const PORT = process.env.PORT || 8080
-const bot = require("./bot_logic")
+const botMain = require("./bot_logic")
 
 const app = express()
 app.use(express.json())
@@ -19,7 +19,8 @@ const Start = async ()=>{
 	try{
 		await sequelize.authenticate()
 		await sequelize.sync()
-		bot.sendMessage(827988306,"app restarted")
+		const Pit = await botMain.Sync()
+		await botMain.bot.sendMessage(827988306,`app restarted ${Pit} sessions was down`)
 		app.listen(PORT,()=> console.log('server started port: ' + PORT))
 
 	}catch(e){

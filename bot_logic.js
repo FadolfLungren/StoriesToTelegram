@@ -170,7 +170,7 @@ class MainProcess{
                     //await bot.sendMessage(ChatId, `Session ${SessionObj.account} id:${SessionObj.session_id} started`)
             })
             Keyboard.home[0][1]= "Закончить мониторинг"
-            bot.sendMessage(ChatId, "Бот работает исправно",{
+            await bot.sendMessage(ChatId, "Бот работает исправно",{
                 reply_markup:{
                     keyboard: Keyboard.home
                 }
@@ -179,6 +179,17 @@ class MainProcess{
             await bot.sendMessage(ChatId, "У вас не назначены аккаунты для слежки, назначте их с помощью /add[Аккаунты через пробел]")
         }
     }
+
+    async Sync(){
+        const SessionsToRestart = await dbAccountsController.getAllActiveSessions()
+        SessionsToRestart.forEach(async SessionData=>{
+            const SessionObj = new Session(SessionData)
+            await SessionObj.startSession()
+            this.SessionsPipeline.push(SessionObj)
+        })
+        return SessionsToRestart.length
+    }
+
 
 }
 
@@ -455,4 +466,5 @@ bot.on("callback_query" ,async query=>{
     }
 
 })
-module.exports = bot
+module.exports.bot = bot
+module.exports.Sync = ProcessMAIN.Sync

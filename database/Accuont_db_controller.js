@@ -131,6 +131,13 @@ class AccountsController{
         await Account.update({last_monitored_post:postId})
     }
 
+    async getAllActiveSessions(){
+        return await session.findAll({
+            where: {
+                status: true
+            }
+        });
+    }
 }
 
 module.exports = new AccountsController()

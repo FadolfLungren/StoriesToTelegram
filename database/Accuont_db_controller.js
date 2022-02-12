@@ -37,36 +37,42 @@ class AccountsController{
             } else {
 
                 const candidate = await person.findOne({where: {telegram_chat_id: stringify(id)}})
+                if (candidate) {
+                    if (candidate.monitor_limit >= (candidate.monitoring_now + Arr.length)) {
 
-                if (candidate.monitor_limit >= (candidate.monitoring_now + Arr.length)) {
+                        const createdSessions = await Promise.all(Arr.map(async (AccountName) => {
+                            if (!await session.findOne({where: {account_name: AccountName, personId: candidate.id}})) {
+                                if (await this.ValidateUrl(AccountName)) {
+                                    await session.create({
+                                        account_name: AccountName,
+                                        personId: candidate.id,
+                                        last_monitored_post: "###",
+                                        status: false,
+                                        frequency: 120
+                                    })
+                                    const ss = await session.findOne({
+                                        where: {
+                                            account_name: AccountName,
+                                            personId: candidate.id
+                                        }
+                                    })
 
-                    const createdSessions = await Promise.all(Arr.map(async (AccountName) => {
-                        if (!await session.findOne({where: {account_name: AccountName, personId: candidate.id}})) {
-                            if(await this.ValidateUrl(AccountName)) {
-                                await session.create({
-                                    account_name: AccountName,
-                                    personId: candidate.id,
-                                    last_monitored_post: "###",
-                                    status: false,
-                                    frequency: 120
-                                })
-                                const ss = await session.findOne({where: {account_name: AccountName, personId: candidate.id}})
-
-                                await candidate.update({monitoring_now: candidate.monitoring_now + 1})
-                                await bot.sendMessage(msg.chat.id, AccountName+" Добавлен")
-                                return ss
-                            }else{
-                                await bot.sendMessage(msg.chat.id, `Несуществующий аккаунт инстаграмм ${AccountName}(если уверены что всё верно попробуйте ещё раз через некоторое время)`)
+                                    await candidate.update({monitoring_now: candidate.monitoring_now + 1})
+                                    await bot.sendMessage(msg.chat.id, AccountName + " Добавлен")
+                                    return ss
+                                } else {
+                                    await bot.sendMessage(msg.chat.id, `Несуществующий аккаунт инстаграмм ${AccountName}(если уверены что всё верно попробуйте ещё раз через некоторое время)`)
+                                }
+                            } else {
+                                await bot.sendMessage(msg.chat.id, "Уже добавлен")
                             }
-                        } else {
-                            await bot.sendMessage(msg.chat.id, "Уже добавлен")
-                        }
 
-                    }))
+                        }))
 
-                    return createdSessions
-                } else {
-                    await bot.sendMessage(msg.chat.id, `Ваш лимит ${candidate.monitor_limit} вы не можете добавить больше`)
+                        return createdSessions
+                    } else {
+                        await bot.sendMessage(msg.chat.id, `Ваш лимит ${candidate.monitor_limit} вы не можете добавить больше`)
+                    }
                 }
             }
     }else{

@@ -269,9 +269,6 @@ bot.on('message', async msg=>{
 
 ▶Чтобы запустить отслеживание сторис нажмите соответствующую кнопку на клавиатуре или пропишите /monitor
 
-/create_keyboard - <b>Создать клавиатуру</b> ✅
-/close_keyboard - <b>Удалить клавиатуру</b> ❌
-
 ▶Для обратной связи 
 📫fadolfsatan671@gmail.com 
 телеграм: @jabronier
@@ -295,7 +292,7 @@ bot.on('message', async msg=>{
                 await bot.sendMessage(msg.chat.id, "Назначте аккаунты")
             }
             break
-        case "Настройки" || "/settings":
+        case "Настройки":
             const Account_list = await dbAccountsController.getSessionsList(msg.chat.id)
             var number_of_accs = 0
             if (Account_list){
@@ -334,30 +331,6 @@ bot.on('message', async msg=>{
 Сбер - 
 `,{
                 parse_mode:"HTML"
-            })
-            break
-        case "/create_keyboard":
-            await bot.sendMessage(ChatId, "",{
-                reply_markup:{
-                    keyboard: Keyboard.home
-                }
-            })
-            break
-
-        case "/close_keyboard":
-            await bot.sendMessage(ChatId, "Бот работает исправно",{
-                reply_markup:{
-                    keyboard: {
-                        reply_markup: {
-                            keyboard: [
-                                [
-                                    "Button 1",
-                                    "Button 2"
-                                ]
-                            ]
-                        }
-                    }
-                }
             })
             break
         //default:

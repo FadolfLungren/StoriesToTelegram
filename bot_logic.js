@@ -29,7 +29,7 @@ class Session {
     }
 
     async startSession(){
-        console.log("ChatId:"+this.ChatId)
+        console.log("ChatId:"+this.#ChatId)
 
         this.#ChatId = await dbPersonController.getChatId(this.#PersonId)
         await Download.stories(this.account, this.#ChatId).then(async Story_mass => {
@@ -80,6 +80,10 @@ class Session {
 }
 class MainProcess{
     SessionsPipeline = []
+
+    constructor() {
+        this.Sync()
+    }
 
     async addActiveSession(msg,match){
         const createdSession = await dbAccountsController.createSession(msg,bot,match)
@@ -466,5 +470,4 @@ bot.on("callback_query" ,async query=>{
     }
 
 })
-module.exports.bot = bot
-module.exports.processMAIN = ProcessMAIN
+module.exports = bot

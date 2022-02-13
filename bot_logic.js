@@ -29,9 +29,8 @@ class Session {
     }
 
     async startSession(){
-        console.log("ChatId:"+this.#ChatId)
-
         this.#ChatId = await dbPersonController.getChatId(this.#PersonId)
+        console.log("ChatId:"+this.#ChatId)
         await Download.stories(this.account, this.#ChatId).then(async Story_mass => {
             if(Story_mass.length===0){
                 console.log("stream empty")
@@ -285,8 +284,8 @@ bot.on('message', async msg=>{
 ▶Чтобы запустить отслеживание сторис нажмите соответствующую кнопку на клавиатуре или пропишите /monitor
 
 ▶Для обратной связи 
-📫fadolfsatan671@gmail.com 
-телеграм: @jabronier
+📫
+телеграм:
 `,{
                 parse_mode:"HTML"
             })

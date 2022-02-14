@@ -21,6 +21,14 @@ const Start = async ()=>{
 		await sequelize.sync()
 		app.listen(PORT,()=> bot.sendMessage(827988306,`Server Restarted on port: ${PORT}`))
 	}catch(e){
+		if(e.status===429){
+			console.log("429 SETTING TIME OUT")
+			setTimeout(async ()=>{
+						await sequelize.authenticate()
+						await sequelize.sync()
+						app.listen(PORT,()=> bot.sendMessage(827988306,`Server Restarted on port: ${PORT}`))
+					},10000)
+		}
 		console.log('e')
 	}
 }

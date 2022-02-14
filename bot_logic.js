@@ -161,27 +161,29 @@ class MainProcess{
             })
         }
     }
-    OpenActiveSessionsOfUser(ChatId){
-        const Sessions = dbAccountsController.getSessionsList(ChatId)
+    async OpenActiveSessionsOfUser(ChatId){
+        const Sessions = await dbAccountsController.getSessionsList(ChatId)
         //console.log("========"+typeof (Sessions.length))
         if (!(Sessions.length === 0)){
-            Sessions.forEach(async SessionData =>{
-                if(!SessionData.status) {
-                    const SessionObj = new Session(SessionData)
-                    await SessionObj.startSession()
-                    await SessionData.update({status: true})
-                    this.SessionsPipeline.push(SessionObj)
-                }
+
+            Sessions.forEach(async SessionData => {
+                if(!SessionData.status){
+                const SessionObj = new Session(SessionData)
+                await SessionObj.startSession()
+                await SessionData.update({status: true})
+                this.SessionsPipeline.push(SessionObj)
+            }
                     //await bot.sendMessage(ChatId, `Session ${SessionObj.account} id:${SessionObj.session_id} started`)
             })
+
             Keyboard.home[0][1]= "Закончить мониторинг"
-            bot.sendMessage(ChatId, "Бот работает исправно",{
+            await bot.sendMessage(ChatId, "Бот работает исправно",{
                 reply_markup:{
                     keyboard: Keyboard.home
                 }
             })
         }else{
-            bot.sendMessage(ChatId, "У вас не назначены аккаунты для слежки, назначте их с помощью /add[Аккаунты через пробел]")
+            await bot.sendMessage(ChatId, "У вас не назначены аккаунты для слежки, назначте их с помощью /add[Аккаунты через пробел]")
         }
     }
 

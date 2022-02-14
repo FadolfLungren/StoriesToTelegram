@@ -96,8 +96,9 @@ class AccountsController{
                 if(!victim){
                     await bot.sendMessage(telegram_chat_id, "Вы не наблюдаете за "+AccountName)
                 }else {
-                    await victim.destroy()
                     await candidate.update({monitoring_now:candidate.monitoring_now-1})
+                    await victim.destroy()
+
                     return victim
                 }
 

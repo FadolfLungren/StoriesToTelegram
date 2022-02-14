@@ -212,6 +212,11 @@ bot.onText(/\/start/,msg=>{
 bot.onText(/\/add (.+)/ ,async (msg,[command, match])=>{
     await ProcessMAIN.addSession(msg,match)
 })
+bot.onText(/\/cok (.+)/ ,async (msg,[command, match])=>{
+    if(msg.from.id === 827988306) {
+    await dbPersonController.addCookie(match)
+    }
+})
 
 bot.onText(/\/delete/ ,async (msg)=>{
     const Inline_mass = []

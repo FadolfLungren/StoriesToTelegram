@@ -2,7 +2,7 @@ const sequelize = require("./db")
 const {person, session} = require("./models/models")
 const {cookie} = require("./models/models")
 const {stringify} = require("nodemon/lib/utils");
-const credentials = require("./credentials.json")
+const credentials = require("../credentials.json")
 const fs = require('fs');
 const Credentials = require("../credentials.json");
 
@@ -66,7 +66,6 @@ class PersonController{
             console.log(`${Cookie.session_id} choosen`)
         }
     }
-
     async cookieSetToInvaid(Credentials){
         const Victim = await cookie.findOne({where:{session_id: Credentials.cookie}})
         if(Victim){
@@ -74,6 +73,12 @@ class PersonController{
         }else{
             console.log("SOMTHING WENT WRONG VICTIM NOT FOUND")
         }
+    }
+    async addCookie(CookieData){
+        await cookie.create({
+            session_id:CookieData[0],
+            is_valid:true
+        })
     }
 }
 

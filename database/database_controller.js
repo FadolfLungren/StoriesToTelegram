@@ -1,6 +1,10 @@
 const sequelize = require("./db")
-const {person} = require("./models/models")
+const {person, session} = require("./models/models")
+const {cookie} = require("./models/models")
 const {stringify} = require("nodemon/lib/utils");
+const credentials = require("./credentials.json")
+const fs = require('fs');
+const Credentials = require("../credentials.json");
 
 
 class PersonController{
@@ -43,7 +47,34 @@ class PersonController{
             return undefined
         }
     }
-}
 
+    async replaceInvalidCookie(){
+        const Cookie = await cookie.findOne({
+            where: {
+                is_valid: true
+            }
+        })
+        if(Cookie){
+            console.log(`${Cookie.session_id} choosen`)
+            credentials.cookie = Cookie.session_id
+
+            fs.writeFile('credentials.json', JSON.stringify(credentials,null,2), (err) => {
+                if (err) console.log(err);
+            })
+
+        }else{
+            console.log(`${Cookie.session_id} choosen`)
+        }
+    }
+
+    async cookieSetToInvaid(Credentials){
+        const Victim = await cookie.findOne({where:{session_id: Credentials.cookie}})
+        if(Victim){
+            await Victim.update({is_vaild:false})
+        }else{
+            console.log("SOMTHING WENT WRONG VICTIM NOT FOUND")
+        }
+    }
+}
 
 module.exports = new PersonController()

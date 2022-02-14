@@ -2,7 +2,7 @@ const Axios = require('axios')
 const Credentials = require('./credentials.json')
 const QueryData = require('./queryData.json')
 const dbAccountsController = require('./database/Accuont_db_controller')
-
+const dbController = require('./database/database_controller')
 var baseURL = "https://www.instagram.com/graphql/query/";
 
 function getURL(baseURL, parameters) {
@@ -28,9 +28,15 @@ async function sendRequest(url, parameters) {
   const response = await Axios.get(getURL(url,parameters),{
     headers: {
       Cookie: Credentials.cookie
-    }}).catch(error => {
+    }}).catch(async error => {
       console.error(`Server error:${url} ${error.response.status}`);
-      process.exit(1)
+      if(error.response.status === 500){
+        await dbController.cookieSetToInvaid(Credentials)
+        await dbController.replaceInvalidCookie()
+        return sendRequest(url, parameters)
+      }else{
+        process.exit(1)
+      }
   });
   return response ? response.data : null
 }

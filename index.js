@@ -29,7 +29,7 @@ const Start = async ()=>{
 						app.listen(PORT,()=> bot.sendMessage(827988306,`Server Restarted on port: ${PORT}`))
 					},10000)
 		}
-		console.log('e')
+		console.log(e.status)
 	}
 }
 Start()

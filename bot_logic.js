@@ -166,10 +166,12 @@ class MainProcess{
         //console.log("========"+typeof (Sessions.length))
         if (!(Sessions.length === 0)){
             Sessions.forEach(async SessionData =>{
-                const SessionObj = new Session(SessionData)
-                await SessionObj.startSession()
-                await SessionData.update({status:true})
-                this.SessionsPipeline.push(SessionObj)
+                if(!SessionData.status) {
+                    const SessionObj = new Session(SessionData)
+                    await SessionObj.startSession()
+                    await SessionData.update({status: true})
+                    this.SessionsPipeline.push(SessionObj)
+                }
                     //await bot.sendMessage(ChatId, `Session ${SessionObj.account} id:${SessionObj.session_id} started`)
             })
             Keyboard.home[0][1]= "Закончить мониторинг"

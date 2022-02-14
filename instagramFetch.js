@@ -30,10 +30,22 @@ async function sendRequest(url, parameters) {
       Cookie: Credentials.cookie
     }}).catch(async error => {
       console.error(`Server error:${url} ${error.response.status}`);
-      if(error.response.status === 500){
-        await dbController.cookieSetToInvaid(Credentials)
-        await dbController.replaceInvalidCookie()
-        return sendRequest(url, parameters)
+      if(error.response.status === 500 || error.response.status === 429){
+        if(error.response.status === 429){
+
+          new Promise(function(resolve, reject) {
+            setTimeout(function() {
+              console.log("RESTARTING 429 ")
+              resolve(sendRequest(url, parameters))
+            },10000)
+          }).then((Result)=>{
+            return Result
+          })
+        }else {
+          await dbController.cookieSetToInvaid(Credentials)
+          await dbController.replaceInvalidCookie()
+          return sendRequest(url, parameters)
+        }
       }else{
         process.exit(1)
       }

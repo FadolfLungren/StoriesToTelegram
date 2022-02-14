@@ -45,8 +45,8 @@ class Session {
                     await bot.sendPhoto(this.#ChatId, Story.streamData.data)
                 }
 
-            })
-        })*/
+            })*/
+        })
 
         this.#IntervalObj=setInterval(async ()=> {
 

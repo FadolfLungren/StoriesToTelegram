@@ -31,12 +31,12 @@ class Session {
     async startSession(){
         this.#ChatId = await dbPersonController.getChatId(this.#PersonId)
         console.log("ChatId:"+this.#ChatId)
-        await Download.stories(this.account, this.#ChatId).then(async Story_mass => {
+        /*await Download.stories(this.account, this.#ChatId).then(async Story_mass => {
             if(Story_mass.length===0){
                 console.log("stream empty")
             }
 
-            /*await Story_mass.forEach(async Story => {
+            await Story_mass.forEach(async Story => {
                 if (Story.type==="vid") {
                     console.log("session id:", this.session_id, "sending_media")
                     await bot.sendVideo(this.#ChatId, Story.streamData.data)
@@ -45,8 +45,8 @@ class Session {
                     await bot.sendPhoto(this.#ChatId, Story.streamData.data)
                 }
 
-            })*/
-        })
+            })
+        })*/
 
         this.#IntervalObj=setInterval(async ()=> {
 

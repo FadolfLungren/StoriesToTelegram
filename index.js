@@ -20,7 +20,6 @@ const Start = async ()=>{
 		await sequelize.authenticate()
 		await sequelize.sync()
 		app.listen(PORT,()=> bot.sendMessage(827988306,`Server Restarted on port: ${PORT}`))
-
 	}catch(e){
 		console.log('e')
 	}

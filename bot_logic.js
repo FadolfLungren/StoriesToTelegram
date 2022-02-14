@@ -30,7 +30,7 @@ class Session {
 
     async startSession(){
         this.#ChatId = await dbPersonController.getChatId(this.#PersonId)
-        console.log("ChatId:"+this.#ChatId)
+        //console.log("ChatId:"+this.#ChatId)
         /*await Download.stories(this.account, this.#ChatId).then(async Story_mass => {
             if(Story_mass.length===0){
                 console.log("stream empty")
@@ -161,8 +161,8 @@ class MainProcess{
             })
         }
     }
-    async OpenActiveSessionsOfUser(ChatId){
-        const Sessions = await dbAccountsController.getSessionsList(ChatId)
+    OpenActiveSessionsOfUser(ChatId){
+        const Sessions = dbAccountsController.getSessionsList(ChatId)
         //console.log("========"+typeof (Sessions.length))
         if (!(Sessions.length === 0)){
             Sessions.forEach(async SessionData =>{
@@ -173,13 +173,13 @@ class MainProcess{
                     //await bot.sendMessage(ChatId, `Session ${SessionObj.account} id:${SessionObj.session_id} started`)
             })
             Keyboard.home[0][1]= "Закончить мониторинг"
-            await bot.sendMessage(ChatId, "Бот работает исправно",{
+            bot.sendMessage(ChatId, "Бот работает исправно",{
                 reply_markup:{
                     keyboard: Keyboard.home
                 }
             })
         }else{
-            await bot.sendMessage(ChatId, "У вас не назначены аккаунты для слежки, назначте их с помощью /add[Аккаунты через пробел]")
+            bot.sendMessage(ChatId, "У вас не назначены аккаунты для слежки, назначте их с помощью /add[Аккаунты через пробел]")
         }
     }
 

@@ -36,7 +36,7 @@ class Session {
                 console.log("stream empty")
             }
 
-            await Story_mass.forEach(async Story => {
+            /*await Story_mass.forEach(async Story => {
                 if (Story.type==="vid") {
                     console.log("session id:", this.session_id, "sending_media")
                     await bot.sendVideo(this.#ChatId, Story.streamData.data)
@@ -46,7 +46,7 @@ class Session {
                 }
 
             })
-        })
+        })*/
 
         this.#IntervalObj=setInterval(async ()=> {
 

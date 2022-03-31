@@ -56,7 +56,7 @@ async function sendRequest(url, parameters) {
 async function getUserID(user) {
   const response = await sendRequest(`https://instagram.com/${user}?__a=1`)
   console.log(user+'++++++'+response.graphql)
-  return response ? response.graphql.user.id : null
+  return response.graphql ? response.graphql.user.id : null
 }
 
 

@@ -31,7 +31,7 @@ class Session {
     async startSession(){
         this.#ChatId = await dbPersonController.getChatId(this.#PersonId)
         //console.log("ChatId:"+this.#ChatId)
-        /*await Download.stories(this.account, this.#ChatId).then(async Story_mass => {
+        await Download.stories(this.account, this.#ChatId).then(async Story_mass => {
             if(Story_mass.length===0){
                 console.log("stream empty")
             }
@@ -46,7 +46,7 @@ class Session {
                 }
 
             })
-        })*/
+        })
 
         this.#IntervalObj=setInterval(async ()=> {
 

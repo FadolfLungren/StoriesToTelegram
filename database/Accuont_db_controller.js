@@ -98,7 +98,6 @@ class AccountsController{
                 }else {
                     await candidate.update({monitoring_now:candidate.monitoring_now-1})
                     await victim.destroy()
-
                     return victim
                 }
 

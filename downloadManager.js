@@ -1,6 +1,8 @@
 const Instagram = require('./instagramFetch.js')
 const Fs = require('fs')
 const Path = require('path')
+const dbController = require("./database/database_controller");
+const Credentials = require("./credentials.json");
 
 function downloadPosts(ofUser, path) {
   fetchManager(ofUser,'photos', async (userID) => {
@@ -70,8 +72,14 @@ function downloadFollowing(ofUser) {
 async function fetchManager(username, logInfo, callback) {
   console.log(`Fetching userID of "${username}"...`)
   const userID = await Instagram.getUserID(username)
-  console.log(`Fetching ${logInfo}...`)
-  return await callback(userID)
+  if (userID){
+    console.log(`Fetching ${logInfo}...`)
+    return await callback(userID)
+  }else{
+    await dbController.cookieSetToInvaid(Credentials)
+    await dbController.replaceInvalidCookie()
+    return fetchManager(username, logInfo, callback)
+  }
 }
 
 async function downloadImages(arrayOfStories) {

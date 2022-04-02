@@ -56,14 +56,14 @@ class PersonController{
         })
         if(Cookie){
             console.log(`${Cookie.session_id} choosen`)
-            credentials.cookie = Cookie.session_id
+            credentials.cookie = 'sessionid='+Cookie.session_id
 
             fs.writeFile('credentials.json', JSON.stringify(credentials,null,2), (err) => {
                 if (err) console.log(err);
             })
 
         }else{
-            console.log(`${Cookie.session_id} choosen`)
+            console.log(`NO VALID COOKIES LEFT`)
         }
     }
     async cookieSetToInvaid(Credentials){

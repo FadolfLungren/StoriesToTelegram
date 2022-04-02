@@ -12,8 +12,10 @@ class UserController{
         await bot.sendMessage(827988306,"Corn UPDATED")
         res.json("200")
     }
+
     async parseAdminReq(req,res){
-        await dbController.addCookie(req)
+
+        //await dbController.addCookie(req)
         await bot.sendMessage(827988306,"Cookie updated")
         res.json("200")
     }

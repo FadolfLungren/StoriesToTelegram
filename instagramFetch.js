@@ -55,7 +55,7 @@ async function sendRequest(url, parameters) {
 
 async function getUserID(user) {
   const response = await sendRequest(`https://instagram.com/${user}?__a=1`)
-  console.log(user+'++++++' + JSON.stringify(response))
+  console.log(user+'++++++' + JSON.stringify(response.graphql.user.is_private))
   return response.graphql ? response.graphql.user.id : null
 }
 

@@ -72,7 +72,7 @@ function downloadFollowing(ofUser) {
 async function fetchManager(username, logInfo, callback) {
   console.log(`Fetching userID of "${username}"...`)
   const user = await Instagram.getUser(username)
-  if (!user.is_private){
+  if (!user?.is_private){
     const userID = user.id
     if (userID) {
       console.log(`Fetching ${logInfo}...`)

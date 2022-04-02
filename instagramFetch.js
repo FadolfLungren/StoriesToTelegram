@@ -20,6 +20,7 @@ function getURL(baseURL, parameters) {
     }
     url = url.substring(0, url.length - 1);
   }
+  console.log(`URL   ${url}`)
   return url;
 }
 

@@ -67,6 +67,7 @@ class PersonController{
         }
     }
     async cookieSetToInvaid(Credentials){
+        console.log(`SEARCHING ++++++++ ${Credentials.cookie}`)
         const Victim = await cookie.findOne({where:{session_id: Credentials.cookie}})
         if(Victim){
             await Victim.update({is_vaild:false})

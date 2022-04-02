@@ -53,10 +53,10 @@ async function sendRequest(url, parameters) {
   return response ? response.data : null
 }
 
-async function getUserID(user) {
+async function getUser(user) {
   const response = await sendRequest(`https://instagram.com/${user}?__a=1`)
   console.log(user+'++++++' + JSON.stringify(response.graphql.user.is_private))
-  return response.graphql ? response.graphql.user.id : null
+    return response.graphql ? response.graphql.user : null
 }
 
 
@@ -336,7 +336,7 @@ function resolvePath(path) {
   return path
 }
 
-module.exports.getUserID = getUserID
+module.exports.getUser = getUser
 module.exports.fetchStories = fetchStories
 module.exports.fetchHighlightedStories = fetchHighlightedStories
 module.exports.fetchSinglePost = fetchSinglePost

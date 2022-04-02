@@ -76,6 +76,7 @@ async function fetchManager(username, logInfo, callback) {
     console.log(`Fetching ${logInfo}...`)
     return await callback(userID)
   }else{
+    console.log(`\n\n  REPLACING${Credentials.cookie} \n\n   `)
     await dbController.cookieSetToInvaid(Credentials)
     await dbController.replaceInvalidCookie()
     return fetchManager(username, logInfo, callback)

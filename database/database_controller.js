@@ -71,7 +71,7 @@ class PersonController{
         const Victim = await cookie.findOne({where:{session_id: Credentials.cookie.split('=')[1]}})
         if(Victim){
             console.log('VICTIM FOUND')
-            await Victim.update({is_vaild:false})
+            await Victim.update({is_valid:false})
         }else{
             console.log("SOMTHING WENT WRONG VICTIM NOT FOUND")
         }

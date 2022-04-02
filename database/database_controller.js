@@ -75,8 +75,9 @@ class PersonController{
         }
     }
     async addCookie(CookieData){
+        console.log(`cookieID+++==${CookieData.session_id}`)
         await cookie.create({
-            session_id:CookieData.session_id,
+            session_id: CookieData.session_id,
             is_valid:true
         })
     }

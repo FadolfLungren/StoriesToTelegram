@@ -89,6 +89,8 @@ async function fetchManager(username, logInfo, callback) {
       console.log("account private")
       return []
     }
+  }else{
+    return []
   }
 }
 

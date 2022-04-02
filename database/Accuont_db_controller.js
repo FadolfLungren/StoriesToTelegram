@@ -11,7 +11,7 @@ class AccountsController{
             }}).catch(error => {
             result = false
         })
-        if(Object.entries(response.data).length === 0){
+        if(!response){//Object.entries(response.data).length === 0
             console.log(`LENGTH REJECTED:${account_name}:`)
             return null
         }else{

@@ -14,8 +14,7 @@ class UserController{
     }
 
     async parseAdminReq(req,res){
-        console.log(req.body)
-        await dbController.addCookie(req)
+        await dbController.addCookie(req.body)
         await bot.sendMessage(827988306,"Cookie updated")
         res.json("200")
     }

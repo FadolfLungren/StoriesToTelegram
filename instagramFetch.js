@@ -20,7 +20,6 @@ function getURL(baseURL, parameters) {
     }
     url = url.substring(0, url.length - 1);
   }
-  console.log(`URL   ${url}`)
   return url;
 }
 
@@ -56,7 +55,7 @@ async function sendRequest(url, parameters) {
 
 async function getUserID(user) {
   const response = await sendRequest(`https://instagram.com/${user}?__a=1`)
-  console.log(user+'++++++'+response.graphql)
+  console.log(user+'++++++' + response)
   return response.graphql ? response.graphql.user.id : null
 }
 

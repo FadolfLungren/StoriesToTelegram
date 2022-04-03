@@ -88,7 +88,7 @@ class MainProcess{
         const Victim = await dbAccountsController.deleteSession(ChatId, AccountName, bot)
         const index = await this.findActiveSessionByParams(ChatId,Victim)
         console.log("daeeeew"+index)
-        if (index) {
+        if (index !== undefined) {
             if (this.SessionsPipeline[index]) {
                 this.SessionsPipeline[index].closeSession()
                 await bot.sendMessage(ChatId, `Session ${this.SessionsPipeline[index].account_name} closed id:${this.SessionsPipeline[index].session_id}`)

@@ -121,7 +121,7 @@ class MainProcess{
         const SessionsToStop = await dbAccountsController.getSessionsList(ChatId)
         if (!(SessionsToStop.length === 0)){
             SessionsToStop.forEach(async SessionData =>{
-                const index = await this.findActiveSessionByParams(ChatId,SessionData)
+                const index = this.findActiveSessionByParams(ChatId,SessionData)
 
                 console.log("index===="+this.SessionsPipeline[index]+"==="+index)
                 if (this.SessionsPipeline[index] !== undefined){

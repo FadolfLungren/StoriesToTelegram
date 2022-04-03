@@ -177,7 +177,7 @@ class MainProcess{
     async refreshStories(ChatId) {
         const SessionsToRefresh = await dbAccountsController.getSessionsList(ChatId)
         //console.log("========"+typeof (Sessions.length))
-        if (!(Sessions.length === 0)) {
+        if (!(SessionsToRefresh.length === 0)) {
 
             SessionsToRefresh.forEach(async SessionData =>{
                 const index = await this.findActiveSessionByParams(ChatId,SessionData)

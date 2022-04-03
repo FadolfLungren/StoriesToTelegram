@@ -179,10 +179,11 @@ class MainProcess{
 
     async refreshStories(ChatId) {
         const SessionsToRefresh = await dbAccountsController.getSessionsList(ChatId)
-        //console.log("========"+typeof (Sessions.length))
+
         if (!(SessionsToRefresh.length === 0)) {
 
             SessionsToRefresh.forEach(async SessionData =>{
+                console.log("sdeferfrefrefrefrefrefrefref-----"+SessionData.account_name)
                 const index = await this.findActiveSessionByParams(ChatId,SessionData)
 
                 if (this.SessionsPipeline[index]){
@@ -191,6 +192,7 @@ class MainProcess{
                     await bot.sendMessage(ChatId,`session cannot be refreshed not active `)
                 }
             })
+
         }
     }
     async ActiveStatus(ChatId){

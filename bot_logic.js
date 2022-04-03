@@ -111,6 +111,7 @@ class MainProcess{
             //await bot.sendMessage(ChatId, `ActiveSessions Massive empty`)
         }
     }
+    async CloseActiveSessionOfUser(ChatId){}
 
     async CloseActiveSessionsOfUser(ChatId){
         const SessionsToStop = await dbAccountsController.getSessionsList(ChatId)
@@ -371,6 +372,7 @@ bot.on("callback_query" ,async query=>{
         case /del(.+)/.test(query.data):
             //console.log(JSON.stringify(query))
             const index = parseInt(query.data.match(/del(.+)/)[1])
+            console.log("sssss+++===="+query.message.reply_markup.inline_keyboard[Math.floor(index/3)][index%3].text)
             const Deleted = await dbAccountsController.deleteSession(query.from.id,query.message.reply_markup.inline_keyboard[Math.floor(index/3)][index%3].text,bot)
 
             if (Deleted) {

@@ -372,7 +372,7 @@ bot.on("callback_query" ,async query=>{
             //console.log(JSON.stringify(query))
             const index = parseInt(query.data.match(/del(.+)/)[1])
             //console.log("sssss+++===="+query.message.reply_markup.inline_keyboard[Math.floor(index/3)][index%3].text)
-            const Deleted = await ProcessMAIN.deleteSession(query.from.id,query.message.reply_markup.inline_keyboard[Math.floor(index/3)][index%3].text,bot)
+            const Deleted = await ProcessMAIN.deleteSession(query.from.id,query.message.reply_markup.inline_keyboard[Math.floor(index/3)][index%3].text)
 
 
             if (Deleted) {

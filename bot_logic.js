@@ -99,7 +99,7 @@ class MainProcess{
         return Victim
     }
 
-    async findActiveSessionByParams(ChatId,SessionData){
+    findActiveSessionByParams(ChatId,SessionData){
         if (!(this.SessionsPipeline.length === 0)) {
             const resu = this.SessionsPipeline.findIndex((ActSessionObj) => {
                 console.log(`${ActSessionObj.account}  |  ${SessionData.account_name} \n

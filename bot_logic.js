@@ -275,7 +275,7 @@ bot.onText(/\/help/,async msg=>{
     })
 })
 bot.onText(/\/keyboard/,async msg=>{
-    await bot.sendMessage(msg.chat.id, ' ',{
+    await bot.sendMessage(msg.chat.id, 'fdsfesdf',{
         reply_markup:{
             keyboard: Keyboard.home
         }

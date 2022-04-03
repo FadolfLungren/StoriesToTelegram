@@ -28,9 +28,7 @@ class Session {
         this.#PersonId = SessionData.personId
     }
 
-    async startSession(){
-        this.#ChatId = await dbPersonController.getChatId(this.#PersonId)
-        //console.log("ChatId:"+this.#ChatId)
+    async downloadStoriesOfUser(){
         await Download.stories(this.account, this.#ChatId).then(async Story_mass => {
             if(Story_mass.length===0){
                 console.log("stream empty")
@@ -47,30 +45,18 @@ class Session {
 
             })
         })
+    }
+    async startSession(){
+        this.#ChatId = await dbPersonController.getChatId(this.#PersonId)
+        //console.log("ChatId:"+this.#ChatId)
+        await this.downloadStoriesOfUser()
 
-        this.#IntervalObj=setInterval(async ()=> {
-
-                await Download.stories(this.account, this.#ChatId).then(async Story_mass => {
-                    await bot.sendMessage(827988306,`checked ${this.account} ${Story_mass}`)
-                    if(Story_mass.length===0){
-                        console.log("stream empty")
-                    }
-                    await Story_mass.forEach(async Story => {
-                        if (Story.type==="vid") {
-                            console.log("session id:", this.session_id, "sending_media")
-                            await bot.sendVideo(this.#ChatId, Story.streamData.data)
-                        }else{
-                            console.log("session id:", this.session_id, "sending_media")
-                            await bot.sendPhoto(this.#ChatId, Story.streamData.data)
-                        }
-
-                    })
-                })
-
-            }
+        this.#IntervalObj=setInterval(await this.downloadStoriesOfUser
             ,this.#milisec_between_posts)
+    }
 
-
+    async refrSession(){
+        await this.downloadStoriesOfUser()
     }
 
     closeSession(){
@@ -165,7 +151,6 @@ class MainProcess{
         const Sessions = await dbAccountsController.getSessionsList(ChatId)
         //console.log("========"+typeof (Sessions.length))
         if (!(Sessions.length === 0)){
-
             Sessions.forEach(async SessionData => {
                 if(!SessionData.status){
                 const SessionObj = new Session(SessionData)
@@ -185,6 +170,10 @@ class MainProcess{
         }else{
             await bot.sendMessage(ChatId, "У вас не назначены аккаунты для слежки, назначте их с помощью /add[Аккаунты через пробел]")
         }
+    }
+
+    async refreshStories(ChatId){
+
     }
 
     async Sync(){
@@ -211,6 +200,10 @@ bot.onText(/\/start/,msg=>{
         }
     })
     dbPersonController.createUser(msg,bot)
+})
+
+bot.onText(/\/refr/,async msg=>{
+    await ProcessMAIN.OpenActiveSessionsOfUser(msg.chat.id)
 })
 
 bot.onText(/\/add (.+)/ ,async (msg,[command, match])=>{

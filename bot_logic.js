@@ -191,7 +191,7 @@ class MainProcess{
         }
     }
     async ActiveStatus(ChatId){
-        await bot.sendMessage(ChatId,this.SessionsPipeline)
+        await bot.sendMessage(ChatId,JSON.stringify(this.SessionsPipeline))
     }
 
 

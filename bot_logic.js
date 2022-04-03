@@ -101,14 +101,12 @@ class MainProcess{
 
     async findActiveSessionByParams(ChatId,SessionData){
         if (!(this.SessionsPipeline.length === 0)) {
-            const resu = this.SessionsPipeline.findIndex(async (ActSessionObj) => {
+            const resu = this.SessionsPipeline.findIndex((ActSessionObj) => {
                 console.log(`${ActSessionObj.account}  |  ${SessionData.account_name} \n
                              ${ActSessionObj.session_id}  |  ${SessionData.id}  |  ${ActSessionObj.session_id === SessionData.id}`)
                 if (ActSessionObj.session_id === SessionData.id) {
                     if (SessionData.status) {
                         return true
-                    } else {
-                        //await bot.sendMessage(ChatId, `Session ${ActSessionObj.account} id:${ActSessionObj.session_id} status is False`)
                     }
                 }
             })

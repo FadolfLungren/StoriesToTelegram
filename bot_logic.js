@@ -185,7 +185,7 @@ class MainProcess{
             SessionsToRefresh.forEach(async SessionData =>{
                 console.log("sdeferfrefrefrefrefrefrefref-----"+SessionData.account_name)
                 const index = await this.findActiveSessionByParams(ChatId,SessionData)
-
+                console.log("index-----"+index)
                 if (this.SessionsPipeline[index]){
                     await this.SessionsPipeline[index].refrSession()
                 }else{

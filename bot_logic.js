@@ -101,7 +101,7 @@ class MainProcess{
 
     async findActiveSessionByParams(ChatId,SessionData){
         if (!(this.SessionsPipeline.length === 0)) {
-            return this.SessionsPipeline.findIndex(async (ActSessionObj) => {
+            const resu = this.SessionsPipeline.findIndex(async (ActSessionObj) => {
                 console.log(`${ActSessionObj.account}  |  ${SessionData.account_name} \n
                              ${ActSessionObj.session_id}  |  ${SessionData.id}   `)
                 if (ActSessionObj.session_id === SessionData.id) {
@@ -112,6 +112,8 @@ class MainProcess{
                     }
                 }
             })
+            console.log("indexFinal = "+resu)
+            return resu
         }else{
             //await bot.sendMessage(ChatId, `ActiveSessions Massive empty`)
         }
@@ -188,7 +190,7 @@ class MainProcess{
                 console.log("sdeferfrefrefrefrefrefrefref-----"+SessionData.account_name)
                 const index = await this.findActiveSessionByParams(ChatId,SessionData)
                 console.log("index-----"+index)
-                if (this.SessionsPipeline[index]){
+                if (this.SessionsPipeline[index] !== undefined){
                     await this.SessionsPipeline[index].refrSession()
                 }else{
                     await bot.sendMessage(ChatId,`session cannot be refreshed not active `)

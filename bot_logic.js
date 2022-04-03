@@ -254,7 +254,7 @@ bot.onText(/\/settings/,async msg=>{
             }})
 })
 bot.onText(/\/help/,async msg=>{
-    await bot.sendMessage(ChatId, `
+    await bot.sendMessage(msg.chat.id, `
 <b>Справка</b>
 
 <b>БОТ В РАЗРАБОТКЕ</b>

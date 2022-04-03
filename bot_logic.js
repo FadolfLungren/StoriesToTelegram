@@ -122,7 +122,7 @@ class MainProcess{
             SessionsToStop.forEach(async SessionData =>{
                 const index = await this.findActiveSessionByParams(ChatId,SessionData)
 
-                //console.log("sedsdfsd===="+index)
+                console.log("index===="+index)
                 if (this.SessionsPipeline[index]){
                     this.SessionsPipeline[index].closeSession()
                     //await bot.sendMessage(ChatId, `Session ${this.SessionsPipeline[index].account} closed id:${this.SessionsPipeline[index].session_id}`)

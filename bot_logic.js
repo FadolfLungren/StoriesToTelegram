@@ -217,7 +217,7 @@ class MainProcess{
 const ProcessMAIN = new MainProcess
 
 bot.onText(/\/start/,msg=>{
-    const text = "Первое включени от" + msg.from.first_name
+    const text = "Первое включение от " + msg.from.first_name
 
     bot.sendMessage(msg.chat.id, text,{
         reply_markup:{
@@ -227,11 +227,31 @@ bot.onText(/\/start/,msg=>{
     dbPersonController.createUser(msg,bot)
 })
 
-bot.onText(/\/refr/,async msg=>{
+bot.onText(/\/refresh   /,async msg=>{
     await ProcessMAIN.refreshStories(msg.chat.id)
 })
 bot.onText(/\/stat/,async msg=>{
     await ProcessMAIN.ActiveStatus(msg.chat.id)
+})
+bot.onText(/\/settings/,async msg=>{
+    const Account_list = await dbAccountsController.getSessionsList(msg.chat.id)
+    var number_of_accs = 0
+    if (Account_list){
+        number_of_accs = Account_list.length
+    }
+
+    await bot.sendMessage(msg.chat.id, form_Html_templ(
+            "Раз в 2 часа",
+            "Не указан",
+            number_of_accs,
+            (await dbPersonController.getLimit(msg, bot)), Account_list),
+        {parse_mode:"HTML",
+            reply_markup:{
+                inline_keyboard:[[{
+                    text:"❎Удалить аккаунты",
+                    callback_data:"Settings_redraw"
+                }]]
+            }})
 })
 
 bot.onText(/\/add (.+)/ ,async (msg,[command, match])=>{
@@ -305,13 +325,15 @@ bot.on('message', async msg=>{
             await bot.sendMessage(ChatId, `
 <b>Справка</b>
 
+<b>БОТ В РАЗРАБОТКЕ</b>
+
 <b>InstagramStoryBot</b> - Этот Бот будет пересылать вам новые сторис из любых выбранных вами аккаунтов инстаграмм, кроме закрытых.
 
-▶Бесплатно можно добавить до 3-х аккаунтов, что-бы это сделать пропишите /add [Аккаунты через пробел] Например: /add nike apple
+▶Можно добавить до 3-х аккаунтов, что-бы это сделать пропишите /add [Аккаунты через пробел] Например: /add nike apple
 
 ▶Удалить аккаунты можно при помощи функции /delete❌ или через настройки /settings🔧
 
-▶Чтобы запустить отслеживание сторис нажмите соответствующую кнопку на клавиатуре или пропишите /monitor
+▶Чтобы запустить отслеживание сторис нажмите соответствующую кнопку на клавиатуре, которую можно вызвать при помощи /keyboard
 
 ▶Для обратной связи 
 📫

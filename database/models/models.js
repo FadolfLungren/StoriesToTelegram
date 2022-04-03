@@ -5,7 +5,7 @@ const person = sequelize.define('person',{
     id:{type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     name:{type: DataTypes.STRING, unique:true},
     telegram_chat_id:{type: DataTypes.STRING, unique:true},
-    monitor_limit:{type:DataTypes.INTEGER, defaultValue:10},
+    monitor_limit:{type:DataTypes.INTEGER, defaultValue:3},
     monitoring_now:{type:DataTypes.INTEGER,defaultValue: 0},
     language_code:{type:DataTypes.STRING}
 }

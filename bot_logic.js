@@ -103,7 +103,7 @@ class MainProcess{
         if (!(this.SessionsPipeline.length === 0)) {
             const resu = this.SessionsPipeline.findIndex(async (ActSessionObj) => {
                 console.log(`${ActSessionObj.account}  |  ${SessionData.account_name} \n
-                             ${ActSessionObj.session_id}  |  ${SessionData.id}   `)
+                             ${ActSessionObj.session_id}  |  ${SessionData.id}  |  ${ActSessionObj.session_id === SessionData.id}`)
                 if (ActSessionObj.session_id === SessionData.id) {
                     if (SessionData.status) {
                         return true

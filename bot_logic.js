@@ -125,7 +125,7 @@ class MainProcess{
                 const index = await this.findActiveSessionByParams(ChatId,SessionData)
 
                 console.log("index===="+index)
-                if (this.SessionsPipeline[index]){
+                if (this.SessionsPipeline[index] !== undefined){
                     this.SessionsPipeline[index].closeSession()
                     //await bot.sendMessage(ChatId, `Session ${this.SessionsPipeline[index].account} closed id:${this.SessionsPipeline[index].session_id}`)
                     this.SessionsPipeline.splice(index, 1)

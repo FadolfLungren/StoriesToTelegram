@@ -56,7 +56,9 @@ class Session {
     }
 
     async refrSession(){
-        await this.downloadStoriesOfUser()
+        if (this.#ChatId) {
+            await this.downloadStoriesOfUser()
+        }
     }
 
     closeSession(){
@@ -172,9 +174,26 @@ class MainProcess{
         }
     }
 
-    async refreshStories(ChatId){
+    async refreshStories(ChatId) {
+        const SessionsToRefresh = await dbAccountsController.getSessionsList(ChatId)
+        //console.log("========"+typeof (Sessions.length))
+        if (!(Sessions.length === 0)) {
 
+            SessionsToRefresh.forEach(async SessionData =>{
+                const index = await this.findActiveSessionByParams(ChatId,SessionData)
+
+                if (this.SessionsPipeline[index]){
+                    await this.SessionsPipeline[index].refrSession()
+                }else{
+                    await bot.sendMessage(ChatId,`session cannot be refreshed not active `)
+                }
+            })
+        }
     }
+    async ActiveStatus(ChatId){
+        await bot.sendMessage(ChatId,this.SessionsPipeline)
+    }
+
 
     async Sync(){
         const SessionsToRestart = await dbAccountsController.getAllActiveSessions()
@@ -203,7 +222,10 @@ bot.onText(/\/start/,msg=>{
 })
 
 bot.onText(/\/refr/,async msg=>{
-    await ProcessMAIN.OpenActiveSessionsOfUser(msg.chat.id)
+    await ProcessMAIN.refreshStories(msg.chat.id)
+})
+bot.onText(/\/stat/,async msg=>{
+    await ProcessMAIN.ActiveStatus(msg.chat.id)
 })
 
 bot.onText(/\/add (.+)/ ,async (msg,[command, match])=>{

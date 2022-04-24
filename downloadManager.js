@@ -1,6 +1,8 @@
 const Instagram = require('./instagramFetch.js')
 const Fs = require('fs')
 const Path = require('path')
+const dbController = require("./database/database_controller");
+const Credentials = require("./credentials.json");
 
 function downloadPosts(ofUser, path) {
   fetchManager(ofUser,'photos', async (userID) => {
@@ -69,9 +71,27 @@ function downloadFollowing(ofUser) {
 
 async function fetchManager(username, logInfo, callback) {
   console.log(`Fetching userID of "${username}"...`)
-  const userID = await Instagram.getUserID(username)
-  console.log(`Fetching ${logInfo}...`)
-  return await callback(userID)
+  const user = await Instagram.getUser(username)
+  if (user) {
+    if (!user.is_private) {
+      const userID = user.id
+      if (userID) {
+        console.log(`Fetching ${logInfo}...`)
+        return await callback(userID)
+      } else {
+        console.log(`\n\n  REPLACING${Credentials.cookie} \n\n   `)
+        await dbController.cookieSetToInvaid(Credentials)
+        await dbController.replaceInvalidCookie()
+        return fetchManager(username, logInfo, callback)
+      }
+
+    } else {
+      console.log("account private")
+      return []
+    }
+  }else{
+    return []
+  }
 }
 
 async function downloadImages(arrayOfStories) {

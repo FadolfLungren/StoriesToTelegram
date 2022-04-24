@@ -28,10 +28,7 @@ class Session {
         this.#PersonId = SessionData.personId
     }
 
-    async startSession(){
-        console.log("ChatId:"+this.ChatId)
-
-        this.#ChatId = await dbPersonController.getChatId(this.#PersonId)
+    async downloadStoriesOfUser(){
         await Download.stories(this.account, this.#ChatId).then(async Story_mass => {
             if(Story_mass.length===0){
                 console.log("stream empty")
@@ -48,30 +45,20 @@ class Session {
 
             })
         })
+    }
+    async startSession(){
+        this.#ChatId = await dbPersonController.getChatId(this.#PersonId)
+        //console.log("ChatId:"+this.#ChatId)
+        await this.downloadStoriesOfUser()
 
-        this.#IntervalObj=setInterval(async ()=> {
-
-                await Download.stories(this.account, this.#ChatId).then(async Story_mass => {
-
-                    if(Story_mass.length===0){
-                        console.log("stream empty")
-                    }
-                    await Story_mass.forEach(async Story => {
-                        if (Story.type==="vid") {
-                            console.log("session id:", this.session_id, "sending_media")
-                            await bot.sendVideo(this.#ChatId, Story.streamData.data)
-                        }else{
-                            console.log("session id:", this.session_id, "sending_media")
-                            await bot.sendPhoto(this.#ChatId, Story.streamData.data)
-                        }
-
-                    })
-                })
-
-            }
+        this.#IntervalObj=setInterval(await this.downloadStoriesOfUser
             ,this.#milisec_between_posts)
+    }
 
-
+    async refrSession(){
+        if (this.#ChatId) {
+            await this.downloadStoriesOfUser()
+        }
     }
 
     closeSession(){
@@ -80,6 +67,10 @@ class Session {
 }
 class MainProcess{
     SessionsPipeline = []
+
+    constructor() {
+        this.Sync()
+    }
 
     async addActiveSession(msg,match){
         const createdSession = await dbAccountsController.createSession(msg,bot,match)
@@ -97,25 +88,30 @@ class MainProcess{
         const Victim = await dbAccountsController.deleteSession(ChatId, AccountName, bot)
         const index = await this.findActiveSessionByParams(ChatId,Victim)
         console.log("daeeeew"+index)
-        if(this.SessionsPipeline[index]) {
-            this.SessionsPipeline[index].closeSession()
-            await bot.sendMessage(ChatId, `Session ${this.SessionsPipeline[index].account_name} closed id:${this.SessionsPipeline[index].session_id}`)
-            this.SessionsPipeline.splice(index, 1)
+        if (index !== undefined) {
+            if (this.SessionsPipeline[index]) {
+                this.SessionsPipeline[index].closeSession()
+                await bot.sendMessage(ChatId, `Session ${this.SessionsPipeline[index].account_name} closed id:${this.SessionsPipeline[index].session_id}`)
+                this.SessionsPipeline.splice(index, 1)
+            }
+            console.log(this.SessionsPipeline)
         }
-        console.log(this.SessionsPipeline)
+        return Victim
     }
 
-    async findActiveSessionByParams(ChatId,SessionData){
+    findActiveSessionByParams(ChatId,SessionData){
         if (!(this.SessionsPipeline.length === 0)) {
-            return this.SessionsPipeline.findIndex(async (ActSessionObj) => {
+            const resu = this.SessionsPipeline.findIndex((ActSessionObj) => {
+                console.log(`${ActSessionObj.account}  |  ${SessionData.account_name} \n
+                             ${ActSessionObj.session_id}  |  ${SessionData.id}  |  ${ActSessionObj.session_id === SessionData.id}`)
                 if (ActSessionObj.session_id === SessionData.id) {
                     if (SessionData.status) {
                         return true
-                    } else {
-                        //await bot.sendMessage(ChatId, `Session ${ActSessionObj.account} id:${ActSessionObj.session_id} status is False`)
                     }
                 }
             })
+            console.log("indexFinal = "+resu)
+            return resu
         }else{
             //await bot.sendMessage(ChatId, `ActiveSessions Massive empty`)
         }
@@ -124,16 +120,18 @@ class MainProcess{
     async CloseActiveSessionsOfUser(ChatId){
         const SessionsToStop = await dbAccountsController.getSessionsList(ChatId)
         if (!(SessionsToStop.length === 0)){
-            //console.log(this.SessionsPipeline)
             SessionsToStop.forEach(async SessionData =>{
-                const index = await this.findActiveSessionByParams(ChatId,SessionData)
+                const index = this.findActiveSessionByParams(ChatId,SessionData)
 
-                //console.log("sedsdfsd===="+index)
-                if (this.SessionsPipeline[index]){
+                console.log("index===="+this.SessionsPipeline[index]+"==="+index)
+                if (this.SessionsPipeline[index] !== undefined){
                     this.SessionsPipeline[index].closeSession()
                     //await bot.sendMessage(ChatId, `Session ${this.SessionsPipeline[index].account} closed id:${this.SessionsPipeline[index].session_id}`)
                     this.SessionsPipeline.splice(index, 1)
                     await SessionData.update({status: false})
+                }else{
+                    await SessionData.update({status: false})
+                    await bot.sendMessage(ChatId, `Session ${SessionData.account_name} went wrong: status set to${SessionData.status}`)
                 }
                 console.log(this.SessionsPipeline)
             })
@@ -159,15 +157,18 @@ class MainProcess{
         const Sessions = await dbAccountsController.getSessionsList(ChatId)
         //console.log("========"+typeof (Sessions.length))
         if (!(Sessions.length === 0)){
-            Sessions.forEach(async SessionData =>{
+            Sessions.forEach(async SessionData => {
+                if(!SessionData.status){
                 const SessionObj = new Session(SessionData)
                 await SessionObj.startSession()
-                await SessionData.update({status:true})
+                await SessionData.update({status: true})
                 this.SessionsPipeline.push(SessionObj)
+            }
                     //await bot.sendMessage(ChatId, `Session ${SessionObj.account} id:${SessionObj.session_id} started`)
             })
+
             Keyboard.home[0][1]= "Закончить мониторинг"
-            bot.sendMessage(ChatId, "Бот работает исправно",{
+            await bot.sendMessage(ChatId, "Бот работает исправно",{
                 reply_markup:{
                     keyboard: Keyboard.home
                 }
@@ -177,12 +178,46 @@ class MainProcess{
         }
     }
 
+    async refreshStories(ChatId) {
+        const SessionsToRefresh = await dbAccountsController.getSessionsList(ChatId)
+
+        if (!(SessionsToRefresh.length === 0)) {
+
+            SessionsToRefresh.forEach(async SessionData =>{
+                console.log("sdeferfrefrefrefrefrefrefref-----"+SessionData.account_name)
+                const index = await this.findActiveSessionByParams(ChatId,SessionData)
+                console.log("index-----"+index)
+                if (this.SessionsPipeline[index] !== undefined){
+                    await this.SessionsPipeline[index].refrSession()
+                }else{
+                    await bot.sendMessage(ChatId,`session cannot be refreshed not active `)
+                }
+            })
+
+        }
+    }
+    async ActiveStatus(ChatId){
+        await bot.sendMessage(ChatId,JSON.stringify(this.SessionsPipeline))
+    }
+
+
+    async Sync(){
+        const SessionsToRestart = await dbAccountsController.getAllActiveSessions()
+        SessionsToRestart.forEach(async SessionData=>{
+            const SessionObj = new Session(SessionData)
+            await SessionObj.startSession()
+            this.SessionsPipeline.push(SessionObj)
+        })
+        await bot.sendMessage(827988306,`ProcessMAIN restarted ${SessionsToRestart.length}sessions was down`)
+        return SessionsToRestart.length
+    }
+
 }
 
 const ProcessMAIN = new MainProcess
 
 bot.onText(/\/start/,msg=>{
-    const text = "Первое включени от" + msg.from.first_name
+    const text = "Первое включение от " + msg.from.first_name
 
     bot.sendMessage(msg.chat.id, text,{
         reply_markup:{
@@ -192,8 +227,67 @@ bot.onText(/\/start/,msg=>{
     dbPersonController.createUser(msg,bot)
 })
 
+bot.onText(/\/refresh   /,async msg=>{
+    await ProcessMAIN.refreshStories(msg.chat.id)
+})
+bot.onText(/\/stat/,async msg=>{
+    await ProcessMAIN.ActiveStatus(msg.chat.id)
+})
+bot.onText(/\/settings/,async msg=>{
+    const Account_list = await dbAccountsController.getSessionsList(msg.chat.id)
+    var number_of_accs = 0
+    if (Account_list){
+        number_of_accs = Account_list.length
+    }
+
+    await bot.sendMessage(msg.chat.id, form_Html_templ(
+            "Раз в 2 часа",
+            "Не указан",
+            number_of_accs,
+            (await dbPersonController.getLimit(msg, bot)), Account_list),
+        {parse_mode:"HTML",
+            reply_markup:{
+                inline_keyboard:[[{
+                    text:"❎Удалить аккаунты",
+                    callback_data:"Settings_redraw"
+                }]]
+            }})
+})
+bot.onText(/\/help/,async msg=>{
+    await bot.sendMessage(msg.chat.id, `
+<b>Справка</b>
+
+<b>БОТ В РАЗРАБОТКЕ</b>
+
+<b>InstagramStoryBot</b> - Этот Бот будет пересылать вам новые сторис из любых выбранных вами аккаунтов инстаграмм, кроме закрытых.
+
+▶Можно добавить до 3-х аккаунтов, что-бы это сделать пропишите /add [Аккаунты через пробел] Например: /add nike apple
+
+▶Удалить аккаунты можно при помощи функции /delete❌ или через настройки /settings🔧
+
+▶Чтобы запустить отслеживание сторис нажмите соответствующую кнопку на клавиатуре, которую можно вызвать при помощи /keyboard
+
+▶Для обратной связи 
+📫
+телеграм:
+`,{
+        parse_mode:"HTML"
+    })
+})
+bot.onText(/\/keyboard/,async msg=>{
+    await bot.sendMessage(msg.chat.id, 'fdsfesdf',{
+        reply_markup:{
+            keyboard: Keyboard.home
+        }
+    })
+})
 bot.onText(/\/add (.+)/ ,async (msg,[command, match])=>{
     await ProcessMAIN.addSession(msg,match)
+})
+bot.onText(/\/cok (.+)/ ,async (msg,[command, match])=>{
+    if(msg.from.id === 827988306) {
+    await dbPersonController.addCookie(match)
+    }
 })
 
 bot.onText(/\/delete/ ,async (msg)=>{
@@ -234,14 +328,14 @@ bot.onText(/\/delete/ ,async (msg)=>{
         await bot.sendMessage(msg.chat.id,"У вас нет аккаунтов, что-бы их удалять")
     }
 })
-bot.onText(/\/del_(.+)/ ,async (msg,query)=>{
+/*bot.onText(/\/del_(.+)/ ,async (msg,query)=>{
     if(query)
     {
         await ProcessMAIN.deleteSession(msg.chat.id, query[1])
     }else{
         await bot.sendMessage(msg.from.id,"notBASED")
     }
-})
+})*/
 
 ActiveSessions=[]
 bot.on('message', async msg=>{
@@ -250,80 +344,27 @@ bot.on('message', async msg=>{
     switch (text){
         case "Начать мониторинг":
             await ProcessMAIN.OpenActiveSessionsOfUser(ChatId)
-            /*const Sessions = await dbAccountsController.getSessionsList(msg.chat.id)
-            //console.log("========"+typeof (Sessions.length))
-            if (!(Sessions.length === 0)){
-                Sessions.forEach(async SessionData =>{
-                    const SessionObj = new Session(SessionData)
-                    await SessionObj.startSession()
-                    await SessionData.update({status:true})
-                    ActiveSessions.push(SessionObj)
-                    await bot.sendMessage(ChatId, `Session ${SessionObj.account} id:${SessionObj.session_id} started`)
-                })
-                Keyboard.home[0][1]= "Закончить мониторинг"
-                bot.sendMessage(msg.chat.id, text,{
-                    reply_markup:{
-                        keyboard: Keyboard.home
-                    }
-                })
-            }else{
-                await bot.sendMessage(ChatId, "no_sessions")
-            }*/
-
             break
         case "Закончить мониторинг":
             await ProcessMAIN.CloseActiveSessionsOfUser(ChatId)
-            /*const SessionsToStop = await dbAccountsController.getSessionsList(msg.chat.id)
-            if (!(SessionsToStop.length === 0)){
-
-                SessionsToStop.forEach(async SessionData =>{
-                    if (!(ActiveSessions.length === 0)) {
-                        ActiveSessions.forEach(async (ActSessionObj, index) => {
-                            if (ActSessionObj.session_id === SessionData.id) {
-                                if (SessionData.status) {
-                                    ActSessionObj.closeSession()
-                                    ActiveSessions.splice(index, 1)
-                                    await SessionData.update({status: false})
-                                    await bot.sendMessage(ChatId, `Session ${ActSessionObj.account} closed id:${ActSessionObj.session_id}`)
-                                } else {
-                                    await bot.sendMessage(ChatId, `Session ${ActSessionObj.account} id:${ActSessionObj.session_id} status is False`)
-                                }
-                            }
-                        })
-                    }else{
-                        await bot.sendMessage(ChatId, `ActiveSessions Massive empty`)
-                    }
-                })
-
-
-                Keyboard.home[0][1]= "Начать мониторинг"
-                bot.sendMessage(msg.chat.id, text,{
-                    reply_markup:{
-                        keyboard: Keyboard.home
-                    }
-                })
-            }else{
-                await bot.sendMessage(ChatId, "no_sessions_to_close set it by /monitor")
-            }*/
             break
         case "Справка":
             await bot.sendMessage(ChatId, `
 <b>Справка</b>
 
+<b>БОТ В РАЗРАБОТКЕ</b>
+
 <b>InstagramStoryBot</b> - Этот Бот будет пересылать вам новые сторис из любых выбранных вами аккаунтов инстаграмм, кроме закрытых.
 
-▶Бесплатно можно добавить до 3-х аккаунтов, что-бы это сделать пропишите /add [Аккаунты через пробел] Например: /add nike apple
+▶Можно добавить до 3-х аккаунтов, что-бы это сделать пропишите /add [Аккаунты через пробел] Например: /add nike apple
 
 ▶Удалить аккаунты можно при помощи функции /delete❌ или через настройки /settings🔧
 
-▶Чтобы запустить отслеживание сторис нажмите соответствующую кнопку на клавиатуре или пропишите /monitor
-
-/create_keyboard - <b>Создать клавиатуру</b> ✅
-/delete_keyboard - <b>Удалить клавиатуру</b> ❌
+▶Чтобы запустить отслеживание сторис нажмите соответствующую кнопку на клавиатуре, которую можно вызвать при помощи /keyboard
 
 ▶Для обратной связи 
-📫fadolfSatan671@gmail.com 
-телеграм: @jabronier
+📫
+телеграм:
 `,{
                 parse_mode:"HTML"
             })
@@ -365,12 +406,11 @@ bot.on('message', async msg=>{
                     }})
 
             break
-        case "СОСИ ЖОПУ":
+        case "Донат":
+            await bot.sendMessage(ChatId, `Бот в разработке`,{
+                parse_mode:"HTML"
+            })
             break
-        case "/start":
-            break
-        case "/monitor":
-            await bot.sendMessage(ChatId, "✅cerfСУКА")
         //default:
             //await bot.sendMessage(ChatId, text)
     }
@@ -386,7 +426,9 @@ bot.on("callback_query" ,async query=>{
         case /del(.+)/.test(query.data):
             //console.log(JSON.stringify(query))
             const index = parseInt(query.data.match(/del(.+)/)[1])
-            const Deleted = await dbAccountsController.deleteSession(query.from.id,query.message.reply_markup.inline_keyboard[Math.floor(index/3)][index%3].text,bot)
+            //console.log("sssss+++===="+query.message.reply_markup.inline_keyboard[Math.floor(index/3)][index%3].text)
+            const Deleted = await ProcessMAIN.deleteSession(query.from.id,query.message.reply_markup.inline_keyboard[Math.floor(index/3)][index%3].text)
+
 
             if (Deleted) {
                 const Inline_mass = []

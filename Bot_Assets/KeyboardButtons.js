@@ -2,7 +2,7 @@ module.exports = {
     home:{
         help:'Справка',
         ActiveAccaunts:"Начать мониторинг",
-        Pay:"СОСИ ЖОПУ",
+        Pay:"Донат",
         Settings:'Настройки'
     },
     opt:{

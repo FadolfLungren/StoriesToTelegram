@@ -1,6 +1,10 @@
 const sequelize = require("./db")
-const {person} = require("./models/models")
+const {person, session} = require("./models/models")
+const {cookie} = require("./models/models")
 const {stringify} = require("nodemon/lib/utils");
+const credentials = require("../credentials.json")
+const fs = require('fs');
+const Credentials = require("../credentials.json");
 
 
 class PersonController{
@@ -27,7 +31,12 @@ class PersonController{
         }else{
             console.log(username,id)
             const candidate = await  person.findOne({where:{telegram_chat_id: stringify(id)}})
-            return candidate.monitor_limit
+            if(candidate){
+                return candidate.monitor_limit
+            }else{
+                console.log(`user ${username} not found`)
+                return null
+            }
         }
     }
     async getChatId(id){
@@ -38,7 +47,42 @@ class PersonController{
             return undefined
         }
     }
-}
 
+    async replaceInvalidCookie(){
+        const Cookie = await cookie.findOne({
+            where: {
+                is_valid: true
+            }
+        })
+        if(Cookie){
+            console.log(`${Cookie.session_id} choosen`)
+            credentials.cookie = 'sessionid='+Cookie.session_id
+
+            fs.writeFile('credentials.json', JSON.stringify(credentials,null,2), (err) => {
+                if (err) console.log(err);
+            })
+
+        }else{
+            console.log(`NO VALID COOKIES LEFT`)
+        }
+    }
+    async cookieSetToInvaid(Credentials){
+        console.log(`SEARCHING ++++++++ ${Credentials.cookie.split('=')[1]}`)
+        const Victim = await cookie.findOne({where:{session_id: Credentials.cookie.split('=')[1]}})
+        if(Victim){
+            console.log('VICTIM FOUND')
+            await Victim.update({is_valid:false})
+        }else{
+            console.log("SOMTHING WENT WRONG VICTIM NOT FOUND")
+        }
+    }
+    async addCookie(CookieData){
+        console.log(`cookieID+++==${CookieData.session_id}`)
+        await cookie.create({
+            session_id: CookieData.session_id,
+            is_valid:true
+        })
+    }
+}
 
 module.exports = new PersonController()

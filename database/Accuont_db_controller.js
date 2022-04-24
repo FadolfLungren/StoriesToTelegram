@@ -1,21 +1,21 @@
 const {person,session} = require("./models/models");
-const Axios = require('Axios')
+const Axios = require('axios')
 const Credentials = require('../credentials.json')
 const {stringify} = require("nodemon/lib/utils");
 class AccountsController{
     async ValidateUrl(account_name){
         var result = true
-        const response = await Axios.get(`https://www.instagram.com/${account_name}/`,{
+        const response = await Axios.get(`https://www.instagram.com/${account_name}?__a=1`,{
             headers: {
                 Cookie: Credentials.cookie
             }}).catch(error => {
             result = false
         })
-        if(!result.length){
-            console.log(`LENGTH REJECTED:${account_name}`)
+        if(!response){//Object.entries(response.data).length === 0
+            console.log(`LENGTH REJECTED:${account_name}:`)
             return null
         }else{
-            return result
+            return response
         }
     }
 
@@ -36,36 +36,49 @@ class AccountsController{
             } else {
 
                 const candidate = await person.findOne({where: {telegram_chat_id: stringify(id)}})
+                if (candidate) {
+                    if (candidate.monitor_limit >= (candidate.monitoring_now + Arr.length)) {
 
-                if (candidate.monitor_limit >= (candidate.monitoring_now + Arr.length)) {
-
-                    const createdSessions = await Promise.all(Arr.map(async (AccountName) => {
-                        if (!await session.findOne({where: {account_name: AccountName, personId: candidate.id}})) {
-                            if(await this.ValidateUrl(AccountName)) {
-                                await session.create({
-                                    account_name: AccountName,
-                                    personId: candidate.id,
-                                    last_monitored_post: "###",
-                                    status: false,
-                                    frequency: 120
-                                })
-                                const ss = await session.findOne({where: {account_name: AccountName, personId: candidate.id}})
-
+                        const createdSessions = await Promise.all(Arr.map(async (AccountName) => {
+                            if(candidate.monitoring_now<candidate.monitor_limit) {
                                 await candidate.update({monitoring_now: candidate.monitoring_now + 1})
-                                await bot.sendMessage(msg.chat.id, AccountName+" Добавлен")
-                                return ss
-                            }else{
-                                await bot.sendMessage(msg.chat.id, "Несуществующий аккаунт инстаграмм (если уверены что всё верно попробуйте ещё раз через некоторое время)")
+                                if (!await session.findOne({
+                                    where: {
+                                        account_name: AccountName,
+                                        personId: candidate.id
+                                    }
+                                })) {
+                                    if (await this.ValidateUrl(AccountName)) {
+                                        await session.create({
+                                            account_name: AccountName,
+                                            personId: candidate.id,
+                                            last_monitored_post: "###",
+                                            status: false,
+                                            frequency: 120
+                                        })
+                                        const ss = await session.findOne({
+                                            where: {
+                                                account_name: AccountName,
+                                                personId: candidate.id
+                                            }
+                                        })
+
+                                        //await candidate.update({monitoring_now: candidate.monitoring_now + 1})
+                                        await bot.sendMessage(msg.chat.id, AccountName + " Добавлен")
+                                        return ss
+                                    } else {
+                                        await bot.sendMessage(msg.chat.id, `Несуществующий аккаунт инстаграмм ${AccountName}(если уверены что всё верно попробуйте ещё раз через некоторое время)`)
+                                    }
+                                } else {
+                                    await bot.sendMessage(msg.chat.id, "Уже добавлен")
+                                }
                             }
-                        } else {
-                            await bot.sendMessage(msg.chat.id, "Уже добавлен")
-                        }
+                        }))
 
-                    }))
-
-                    return createdSessions
-                } else {
-                    await bot.sendMessage(msg.chat.id, `Ваш лимит ${candidate.monitor_limit} вы не можете добавить больше`)
+                        return createdSessions
+                    } else {
+                        await bot.sendMessage(msg.chat.id, `Ваш лимит ${candidate.monitor_limit} вы не можете добавить больше`)
+                    }
                 }
             }
     }else{
@@ -83,8 +96,8 @@ class AccountsController{
                 if(!victim){
                     await bot.sendMessage(telegram_chat_id, "Вы не наблюдаете за "+AccountName)
                 }else {
-                    await victim.destroy()
                     await candidate.update({monitoring_now:candidate.monitoring_now-1})
+                    await victim.destroy()
                     return victim
                 }
 
@@ -92,11 +105,16 @@ class AccountsController{
     }
     async getSessionsList(telegram_chat_id){
         const candidate = await person.findOne({where:{telegram_chat_id: stringify(telegram_chat_id)}})
-        return await session.findAll({
-            where: {
-                personId: candidate.id
-            }
-        });
+        if (candidate) {
+            return await session.findAll({
+                where: {
+                    personId: candidate.id
+                }
+            });
+        }else{
+            console.log(`${telegram_chat_id} не найден`)
+            return []
+        }
     }
     async getLastPosted(username,chatId){
         const candidate = await person.findOne({where:{telegram_chat_id: stringify(chatId)}})
@@ -120,6 +138,13 @@ class AccountsController{
         await Account.update({last_monitored_post:postId})
     }
 
+    async getAllActiveSessions(){
+        return await session.findAll({
+            where: {
+                status: true
+            }
+        });
+    }
 }
 
 module.exports = new AccountsController()

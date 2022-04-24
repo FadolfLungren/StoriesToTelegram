@@ -1,8 +1,8 @@
-const Axios = require('Axios')
+const Axios = require('axios')
 const Credentials = require('./credentials.json')
-const QueryData = require('./QueryData.json')
+const QueryData = require('./queryData.json')
 const dbAccountsController = require('./database/Accuont_db_controller')
-
+const dbController = require('./database/database_controller')
 var baseURL = "https://www.instagram.com/graphql/query/";
 
 function getURL(baseURL, parameters) {
@@ -28,17 +28,34 @@ async function sendRequest(url, parameters) {
   const response = await Axios.get(getURL(url,parameters),{
     headers: {
       Cookie: Credentials.cookie
-    }}).catch(error => {
+    }}).catch(async error => {
       console.error(`Server error:${url} ${error.response.status}`);
-      process.exit(1)
+      if(error.response.status === 500 || error.response.status === 429){
+        if(error.response.status === 429){
+
+          new Promise(function(resolve, reject) {
+            setTimeout(function() {
+              console.log("RESTARTING 429 ")
+              resolve(sendRequest(url, parameters))
+            },10000)
+          }).then((Result)=>{
+            return Result
+          })
+        }else {
+          await dbController.cookieSetToInvaid(Credentials)
+          await dbController.replaceInvalidCookie()
+          return sendRequest(url, parameters)
+        }
+      }else{
+        process.exit(1)
+      }
   });
   return response ? response.data : null
 }
 
-async function getUserID(user) {
+async function getUser(user) {
   const response = await sendRequest(`https://instagram.com/${user}?__a=1`)
-  console.log(user+'++++++'+response.graphql)
-  return response ? response.graphql.user.id : null
+    return response.graphql ? response.graphql.user : null
 }
 
 
@@ -57,7 +74,7 @@ async function fetchStories(users,ChatId) {
   data.variables.reel_ids = users;
   var stories = [];
   var response = await sendRequest(baseURL,data)
-  console.log(`SETTING LAST POSTED Response:=====${JSON.stringify(response)}`)
+  //console.log(`SETTING LAST POSTED Response:=====${JSON.stringify(response)}`)
   if (response.data.reels_media && response.data.reels_media.length) {
     response = response.data.reels_media[0].items.reverse();
     const last_posted = await dbAccountsController.getLastPosted(response[0].owner.username,ChatId)
@@ -318,7 +335,7 @@ function resolvePath(path) {
   return path
 }
 
-module.exports.getUserID = getUserID
+module.exports.getUser = getUser
 module.exports.fetchStories = fetchStories
 module.exports.fetchHighlightedStories = fetchHighlightedStories
 module.exports.fetchSinglePost = fetchSinglePost
